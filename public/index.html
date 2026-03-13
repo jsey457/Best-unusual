@@ -406,13 +406,15 @@ async function kalshi(path, params = {}) {
   return r.json();
 }
 
-async function fetchMarkets(city) {
-  if (mktCache[city.series]?.loaded) return;
+async function fetchMarkets(city, force = false) {
+  if (mktCache[city.series]?.loaded && !force) return;
   try {
     const data = await kalshi('/markets', { series_ticker: city.series, status: 'open', limit: 50 });
-    mktCache[city.series] = { markets: data.markets || [], loaded: true };
+    const markets = data.markets || [];
+    console.log(`[${city.series}] Got ${markets.length} markets. First:`, markets[0]);
+    mktCache[city.series] = { markets, loaded: true };
   } catch(e) {
-    console.error('Markets error:', e);
+    console.error(`[${city.series}] Markets error:`, e);
     mktCache[city.series] = { markets: [], loaded: true, error: e.message };
   }
 }
@@ -456,12 +458,22 @@ async function fetchWeather(city) {
 
 // ── HELPERS ──────────────────────────────────────────────────────────────────
 function getBracketPrice(m) {
-  // yes_price is already in cents (0-99), yes_bid is also in cents
-  // yes_bid_dollars / last_price_dollars are decimal strings like "0.56"
-  if (m.yes_price != null && m.yes_price > 0) return m.yes_price;
-  if (m.yes_bid   != null && m.yes_bid   > 0) return m.yes_bid;
-  const dollars = parseFloat(m.yes_bid_dollars || m.last_price_dollars || '0');
-  return isNaN(dollars) ? 0 : Math.round(dollars * 100);
+  // yes_price = integer cents from /markets endpoint (confirmed from Kalshi quickstart docs)
+  // yes_bid / yes_ask = integer cents (from /events endpoint)
+  // yes_bid_dollars / yes_ask_dollars = decimal string "0.56"
+  if (m.yes_bid > 0 && m.yes_ask > 0) {
+    return Math.round((m.yes_bid + m.yes_ask) / 2); // midpoint
+  }
+  if (m.yes_price > 0) return m.yes_price;
+  if (m.yes_bid   > 0) return m.yes_bid;
+  if (m.last_price > 0) return m.last_price;
+  // fallback: dollar strings
+  const bid = parseFloat(m.yes_bid_dollars || '0');
+  const ask = parseFloat(m.yes_ask_dollars || m.last_price_dollars || '0');
+  if (bid > 0 && ask > 0) return Math.round((bid + ask) / 2 * 100);
+  if (bid > 0) return Math.round(bid * 100);
+  if (ask > 0) return Math.round(ask * 100);
+  return 0;
 }
 
 function bracketMatchesTemp(market, tempF) {
@@ -813,6 +825,16 @@ async function init() {
     await Promise.all([fetchMarkets(city), fetchWeather(city)]);
     renderTabs();
   }));
+
+  // Refresh active city market prices every 30s to stay live
+  setInterval(async () => {
+    const city = CITIES.find(c => c.series === activeSeries);
+    if (city) {
+      await fetchMarkets(city, true);
+      renderLeft();
+      setStatus('live', `Live · updated ${new Date().toLocaleTimeString()}`);
+    }
+  }, 30000);
 }
 
 init();
