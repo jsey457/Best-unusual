@@ -380,8 +380,8 @@ const CITIES = [
 
 const MODELS = [
   { id:'gfs',   name:'GFS',   color:'#1a56db', url:'https://api.open-meteo.com/v1/gfs',      hourly:false },
-  { id:'ecmwf', name:'ECMWF', color:'#7c3aed', url:'https://api.open-meteo.com/v1/ecmwf',    hourly:true  }, // no daily support
-  { id:'nam',   name:'HRRR',  color:'#0d7a3e', url:'https://api.open-meteo.com/v1/gfs',      hourly:false, extra:'&models=hrrr' },
+  { id:'ecmwf', name:'ECMWF', color:'#7c3aed', url:'https://api.open-meteo.com/v1/ecmwf',    hourly:true  },
+  { id:'nbm',   name:'NBM',   color:'#0d7a3e', url:'https://api.open-meteo.com/v1/forecast',  hourly:false, extra:'&models=gfs025' },
   { id:'gem',   name:'GEM',   color:'#92400e', url:'https://api.open-meteo.com/v1/gem',       hourly:false },
   { id:'icon',  name:'ICON',  color:'#c81e1e', url:'https://api.open-meteo.com/v1/dwd-icon',  hourly:false },
 ];
@@ -815,6 +815,8 @@ function toast(msg) {
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
 async function init() {
   setStatus('loading', 'Loading...');
   renderTabs();
@@ -824,15 +826,16 @@ async function init() {
   await Promise.all([fetchMarkets(first), fetchWeather(first)]);
   renderLeft();
   renderTabs();
+  setStatus('live', 'Live · Kalshi + Open-Meteo');
 
-  const hasMarkets = mktCache[first.series]?.markets?.length > 0;
-  setStatus(hasMarkets ? 'live' : 'live', 'Live · Kalshi + Open-Meteo');
-
-  // Load ALL other cities in parallel for edge dots
-  await Promise.all(CITIES.slice(1).map(async city => {
-    await Promise.all([fetchMarkets(city), fetchWeather(city)]);
+  // Load remaining cities in batches of 3 with 600ms gap to avoid Kalshi 429
+  const rest = CITIES.slice(1);
+  for (let i = 0; i < rest.length; i += 3) {
+    const batch = rest.slice(i, i + 3);
+    await Promise.all(batch.map(city => Promise.all([fetchMarkets(city), fetchWeather(city)])));
     renderTabs();
-  }));
+    if (i + 3 < rest.length) await sleep(600);
+  }
 
   // Refresh active city market prices every 30s to stay live
   setInterval(async () => {
@@ -840,7 +843,7 @@ async function init() {
     if (city) {
       await fetchMarkets(city, true);
       renderLeft();
-      setStatus('live', `Live · updated ${new Date().toLocaleTimeString()}`);
+      setStatus('live', `Live · ${new Date().toLocaleTimeString()}`);
     }
   }, 30000);
 }
