@@ -379,11 +379,11 @@ const CITIES = [
 ];
 
 const MODELS = [
-  { id:'gfs',   name:'GFS',   color:'#1a56db', model:'best_match'     },
-  { id:'ecmwf', name:'ECMWF', color:'#7c3aed', model:'ecmwf_ifs025'   },
-  { id:'nam',   name:'NAM',   color:'#0d7a3e', model:'ncep_nam_conus' },
-  { id:'gem',   name:'GEM',   color:'#92400e', model:'gem_seamless'    },
-  { id:'icon',  name:'ICON',  color:'#c81e1e', model:'icon_seamless'   },
+  { id:'gfs',   name:'GFS',   color:'#1a56db', url:'https://api.open-meteo.com/v1/gfs'      },
+  { id:'ecmwf', name:'ECMWF', color:'#7c3aed', url:'https://api.open-meteo.com/v1/ecmwf'    },
+  { id:'nam',   name:'NAM',   color:'#0d7a3e', url:'https://api.open-meteo.com/v1/gfs',  extra:'&models=gfs_hrrr' },
+  { id:'gem',   name:'GEM',   color:'#92400e', url:'https://api.open-meteo.com/v1/gem'       },
+  { id:'icon',  name:'ICON',  color:'#c81e1e', url:'https://api.open-meteo.com/v1/dwd-icon'  },
 ];
 
 // ── STATE ────────────────────────────────────────────────────────────────────
@@ -425,30 +425,29 @@ async function fetchWeather(city) {
 
   await Promise.all(MODELS.map(async m => {
     try {
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&daily=temperature_2m_max&temperature_unit=fahrenheit&forecast_days=3&models=${m.model}&timezone=auto&start_date=${today}&end_date=${today}`;
+      const url = `${m.url}?latitude=${city.lat}&longitude=${city.lon}&daily=temperature_2m_max&temperature_unit=fahrenheit&forecast_days=1&timezone=auto&start_date=${today}&end_date=${today}${m.extra||''}`;
       const r = await fetch(url);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
       const d = await r.json();
       const v = d.daily?.temperature_2m_max?.[0];
       results[m.id] = (v != null) ? Math.round(v * 10) / 10 : null;
-    } catch(_) { results[m.id] = null; }
+    } catch(e) {
+      console.warn(`${m.name} fetch failed:`, e.message);
+      results[m.id] = null;
+    }
   }));
 
   wxCache[city.series] = results;
 }
 
 // ── HELPERS ──────────────────────────────────────────────────────────────────
-function parseDollarsToPercent(dolStr) {
-  // yes_bid_dollars = "0.56" → 56¢
-  const v = parseFloat(dolStr);
-  return isNaN(v) ? null : Math.round(v * 100);
-}
-
 function getBracketPrice(m) {
-  // Prefer yes_bid over last_price
-  const v = parseDollarsToPercent(m.yes_bid_dollars) ??
-            parseDollarsToPercent(m.last_price_dollars) ??
-            m.yes_price ?? 0;
-  return v;
+  // yes_price is already in cents (0-99), yes_bid is also in cents
+  // yes_bid_dollars / last_price_dollars are decimal strings like "0.56"
+  if (m.yes_price != null && m.yes_price > 0) return m.yes_price;
+  if (m.yes_bid   != null && m.yes_bid   > 0) return m.yes_bid;
+  const dollars = parseFloat(m.yes_bid_dollars || m.last_price_dollars || '0');
+  return isNaN(dollars) ? 0 : Math.round(dollars * 100);
 }
 
 function bracketMatchesTemp(market, tempF) {
@@ -493,10 +492,6 @@ function renderTabs() {
   const bar = document.getElementById('cityBar');
   bar.innerHTML = CITIES.map(c => {
     const hasEdge = edgeScore(c) > 45;
-    const loaded  = mktCache[c.series]?.loaded;
-    const hasData = mktCache[c.series]?.markets?.length > 0;
-    const show    = !loaded || hasData; // show if not loaded yet or has markets
-    if (!show) return '';
     return `<div class="city-tab${c.series===activeSeries?' active':''}" onclick="selectCity('${c.series}')">
       ${c.short}${hasEdge?'<span class="edge-pip"></span>':''}
     </div>`;
@@ -790,21 +785,20 @@ async function init() {
   setStatus('loading', 'Loading...');
   renderTabs();
 
+  // Load first city immediately so UI shows fast
   const first = CITIES[0];
-  await fetchMarkets(first);
-  await fetchWeather(first);
+  await Promise.all([fetchMarkets(first), fetchWeather(first)]);
   renderLeft();
   renderTabs();
 
   const hasMarkets = mktCache[first.series]?.markets?.length > 0;
-  setStatus(hasMarkets ? 'live' : 'error', hasMarkets ? 'Live · Kalshi + Open-Meteo' : 'No markets open today');
+  setStatus(hasMarkets ? 'live' : 'live', 'Live · Kalshi + Open-Meteo');
 
-  // Background-load rest for edge dots
-  for (const city of CITIES.slice(1)) {
-    await fetchMarkets(city);
-    await fetchWeather(city);
-    renderTabs(); // update dots as they come in
-  }
+  // Load ALL other cities in parallel for edge dots
+  await Promise.all(CITIES.slice(1).map(async city => {
+    await Promise.all([fetchMarkets(city), fetchWeather(city)]);
+    renderTabs();
+  }));
 }
 
 init();
