@@ -379,11 +379,11 @@ const CITIES = [
 ];
 
 const MODELS = [
-  { id:'gfs',   name:'GFS',   color:'#1a56db', url:'https://api.open-meteo.com/v1/gfs'      },
-  { id:'ecmwf', name:'ECMWF', color:'#7c3aed', url:'https://api.open-meteo.com/v1/ecmwf'    },
-  { id:'nam',   name:'NAM',   color:'#0d7a3e', url:'https://api.open-meteo.com/v1/gfs',  extra:'&models=gfs_hrrr' },
-  { id:'gem',   name:'GEM',   color:'#92400e', url:'https://api.open-meteo.com/v1/gem'       },
-  { id:'icon',  name:'ICON',  color:'#c81e1e', url:'https://api.open-meteo.com/v1/dwd-icon'  },
+  { id:'gfs',   name:'GFS',   color:'#1a56db', url:'https://api.open-meteo.com/v1/gfs',      hourly:false },
+  { id:'ecmwf', name:'ECMWF', color:'#7c3aed', url:'https://api.open-meteo.com/v1/ecmwf',    hourly:true  }, // no daily support
+  { id:'nam',   name:'NAM',   color:'#0d7a3e', url:'https://api.open-meteo.com/v1/forecast',  hourly:false, extra:'&models=nam_conus' },
+  { id:'gem',   name:'GEM',   color:'#92400e', url:'https://api.open-meteo.com/v1/gem',       hourly:false },
+  { id:'icon',  name:'ICON',  color:'#c81e1e', url:'https://api.open-meteo.com/v1/dwd-icon',  hourly:false },
 ];
 
 // ── STATE ────────────────────────────────────────────────────────────────────
@@ -425,14 +425,28 @@ async function fetchWeather(city) {
 
   await Promise.all(MODELS.map(async m => {
     try {
-      const url = `${m.url}?latitude=${city.lat}&longitude=${city.lon}&daily=temperature_2m_max&temperature_unit=fahrenheit&forecast_days=1&timezone=auto&start_date=${today}&end_date=${today}${m.extra||''}`;
-      const r = await fetch(url);
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      const d = await r.json();
-      const v = d.daily?.temperature_2m_max?.[0];
+      let url, v;
+      if (m.hourly) {
+        // ECMWF: fetch hourly temps for today, find the max
+        url = `${m.url}?latitude=${city.lat}&longitude=${city.lon}&hourly=temperature_2m&temperature_unit=fahrenheit&forecast_days=1&timezone=auto${m.extra||''}`;
+        const r = await fetch(url);
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const d = await r.json();
+        if (d.error) throw new Error(d.reason);
+        const temps = d.hourly?.temperature_2m?.filter(t => t != null) || [];
+        v = temps.length ? Math.max(...temps) : null;
+      } else {
+        // All others support daily temperature_2m_max
+        url = `${m.url}?latitude=${city.lat}&longitude=${city.lon}&daily=temperature_2m_max&temperature_unit=fahrenheit&forecast_days=1&timezone=auto${m.extra||''}`;
+        const r = await fetch(url);
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const d = await r.json();
+        if (d.error) throw new Error(d.reason);
+        v = d.daily?.temperature_2m_max?.[0] ?? null;
+      }
       results[m.id] = (v != null) ? Math.round(v * 10) / 10 : null;
     } catch(e) {
-      console.warn(`${m.name} fetch failed:`, e.message);
+      console.warn(`${m.name} failed:`, e.message);
       results[m.id] = null;
     }
   }));
