@@ -4,504 +4,296 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WeatherEdge · Kalshi Temperature Markets</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Barlow:wght@300;400;500;600;700;800;900&family=Barlow+Condensed:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Archivo:wght@400;500;600;700;800;900&family=Archivo+Narrow:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0a0e14;
-  --bg2: #0f1520;
-  --bg3: #141d2b;
-  --border: #1e2d40;
-  --border2: #243447;
-  --text: #e8edf5;
-  --text2: #7a92b0;
-  --text3: #3d5470;
-  --accent: #00d4ff;
-  --accent2: #0099bb;
-  --green: #00e676;
-  --green2: #00a854;
-  --red: #ff4d6a;
-  --red2: #cc2240;
-  --amber: #ffb74d;
-  --amber2: #e65100;
-  --purple: #b388ff;
-  --glow: 0 0 20px rgba(0,212,255,0.15);
-  --glow-green: 0 0 20px rgba(0,230,118,0.2);
-  --glow-red: 0 0 20px rgba(255,77,106,0.2);
+  --bg:      #f4f1ec;
+  --bg2:     #ffffff;
+  --bg3:     #f0ede7;
+  --border:  #e0dbd2;
+  --border2: #ccc7bc;
+  --text:    #1a1714;
+  --text2:   #5a5349;
+  --text3:   #9a9088;
+  --accent:  #1a56db;
+  --accent-light: #e8effd;
+  --green:   #0d7a3e;
+  --green-bg:#e6f5ec;
+  --red:     #c81e1e;
+  --red-bg:  #fde8e8;
+  --amber:   #92400e;
+  --amber-bg:#fef3c7;
+  --shadow:  0 1px 4px rgba(0,0,0,.07), 0 4px 16px rgba(0,0,0,.05);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.06);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Barlow', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+body { font-family: 'Archivo', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; }
 
 /* HEADER */
 header {
-  background: linear-gradient(180deg, rgba(10,14,20,0.98) 0%, rgba(10,14,20,0.9) 100%);
+  background: var(--bg2);
   border-bottom: 1px solid var(--border);
   padding: 0 24px;
-  height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 200;
-  backdrop-filter: blur(12px);
+  height: 54px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 200;
+  box-shadow: var(--shadow-sm);
 }
 .logo {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Archivo', sans-serif;
   font-weight: 900;
-  font-size: 22px;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--text);
+  font-size: 18px;
+  letter-spacing: -0.03em;
+  display: flex; align-items: center; gap: 9px;
 }
-.logo-icon {
-  width: 28px; height: 28px;
-  background: linear-gradient(135deg, var(--accent), var(--purple));
-  border-radius: 6px;
+.logo-mark {
+  width: 30px; height: 30px;
+  background: var(--accent);
+  border-radius: 7px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 14px;
+  font-size: 15px; color: white;
 }
-.logo span { color: var(--accent); }
-.header-right { display: flex; align-items: center; gap: 12px; }
-.status-pill {
-  font-family: 'Space Mono', monospace;
-  font-size: 10px;
-  padding: 4px 10px;
-  border-radius: 20px;
-  border: 1px solid;
+.logo-text { color: var(--text); }
+.logo-text span { color: var(--accent); }
+.status-chip {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; font-weight: 600;
+  padding: 4px 10px; border-radius: 20px;
   display: flex; align-items: center; gap: 5px;
+  border: 1px solid;
+  letter-spacing: 0.04em;
 }
-.status-pill.live { color: var(--green); border-color: rgba(0,230,118,0.3); background: rgba(0,230,118,0.07); }
-.status-pill.error { color: var(--red); border-color: rgba(255,77,106,0.3); background: rgba(255,77,106,0.07); }
-.status-pill.loading { color: var(--amber); border-color: rgba(255,183,77,0.3); background: rgba(255,183,77,0.07); }
-.status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: blink 1.5s ease-in-out infinite; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.status-chip.live   { color: var(--green); background: var(--green-bg); border-color: #9fdcb9; }
+.status-chip.error  { color: var(--red);   background: var(--red-bg);   border-color: #f5b5b2; }
+.status-chip.loading{ color: var(--amber); background: var(--amber-bg); border-color: #fcd34d; }
+.s-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: pulse 1.4s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
 
 /* CITY TABS */
 .city-bar {
   background: var(--bg2);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 2px solid var(--border);
   padding: 0 24px;
-  display: flex;
-  gap: 2px;
-  overflow-x: auto;
-  scrollbar-width: none;
+  display: flex; gap: 0;
+  overflow-x: auto; scrollbar-width: none;
 }
 .city-bar::-webkit-scrollbar { display: none; }
 .city-tab {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-weight: 700;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 12px 16px;
-  cursor: pointer;
-  color: var(--text3);
+  font-family: 'Archivo Narrow', sans-serif;
+  font-weight: 700; font-size: 12px;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 11px 15px;
+  cursor: pointer; color: var(--text3);
   border-bottom: 2px solid transparent;
-  white-space: nowrap;
-  transition: all 0.15s;
-  position: relative;
+  margin-bottom: -2px;
+  white-space: nowrap; transition: all .15s;
+  display: flex; align-items: center; gap: 5px;
 }
-.city-tab:hover { color: var(--text2); }
-.city-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-.city-tab .edge-dot {
-  width: 5px; height: 5px;
-  border-radius: 50%;
-  background: var(--green);
-  display: inline-block;
-  margin-left: 5px;
-  vertical-align: middle;
-  box-shadow: 0 0 6px var(--green);
+.city-tab:hover { color: var(--text2); background: var(--bg3); }
+.city-tab.active { color: var(--accent); border-bottom-color: var(--accent); background: var(--accent-light); }
+.edge-pip { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 5px rgba(13,122,62,.4); }
+
+/* LAYOUT */
+.main { display: grid; grid-template-columns: 1fr 340px; min-height: calc(100vh - 102px); }
+
+/* LEFT */
+.left { padding: 22px 24px; overflow-y: auto; border-right: 1px solid var(--border); }
+
+.section-head {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px; font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--text3); margin-bottom: 12px;
+  display: flex; align-items: center; gap: 10px;
 }
+.section-head::after { content:''; flex:1; height:1px; background: var(--border); }
 
-/* MAIN LAYOUT */
-.main { display: grid; grid-template-columns: 1fr 360px; min-height: calc(100vh - 104px); }
-
-/* LEFT PANEL */
-.left-panel { padding: 20px 24px; border-right: 1px solid var(--border); overflow-y: auto; }
-
-/* MARKET SECTION */
-.section-label {
-  font-family: 'Space Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--text3);
-  margin-bottom: 12px;
-  display: flex; align-items: center; gap: 8px;
-}
-.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-
-.market-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.market-title {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-weight: 800;
-  font-size: 28px;
-  letter-spacing: -0.01em;
-  line-height: 1;
-}
-.market-subtitle { font-size: 13px; color: var(--text2); margin-top: 3px; }
-.market-date { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--accent); }
+/* MARKET HEADER */
+.mkt-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
+.mkt-city { font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 26px; letter-spacing: -.03em; line-height: 1.1; }
+.mkt-sub  { font-size: 12px; color: var(--text3); margin-top: 3px; }
+.mkt-date { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent); text-align: right; }
 
 /* BRACKETS */
-.brackets-wrap { margin-bottom: 24px; }
-.brackets-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
+.brackets { display: flex; flex-direction: column; gap: 5px; margin-bottom: 24px; }
 .bracket-row {
-  display: grid;
-  grid-template-columns: 130px 1fr 70px 70px;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--bg2);
-  transition: all 0.15s;
+  display: grid; grid-template-columns: 140px 1fr 60px 80px;
+  align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: 9px;
+  border: 1px solid var(--border); background: var(--bg2);
+  transition: all .12s;
+}
+.bracket-row:hover { border-color: var(--border2); box-shadow: var(--shadow-sm); }
+.bracket-row.is-peak  { border-color: #93c5fd; background: #eff6ff; }
+.bracket-row.is-leader{ border-color: #6ee7b7; background: #f0fdf4; }
+.b-label { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.b-track  { height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
+.b-fill   { height: 100%; border-radius: 3px; transition: width .5s ease; }
+.b-price  { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; text-align: right; }
+.b-tag    { font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-align: center; letter-spacing:.04em; }
+.b-tag.models-here { background: #dbeafe; color: #1d4ed8; }
+.b-tag.top-mkt     { background: var(--green-bg); color: var(--green); }
+.b-tag.vol         { color: var(--text3); }
+
+/* MODEL CARDS */
+.models-row { display: grid; grid-template-columns: repeat(5,1fr); gap: 8px; margin-bottom: 22px; }
+.model-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 10px; text-align: center;
+  transition: box-shadow .15s;
+}
+.model-card:hover { box-shadow: var(--shadow-sm); }
+.model-card.is-high { border-color: #fca5a5; background: #fff5f5; }
+.model-card.is-low  { border-color: #93c5fd; background: #f0f8ff; }
+.m-name { font-family: 'Archivo Narrow', sans-serif; font-weight: 700; font-size: 10px; letter-spacing:.1em; text-transform: uppercase; margin-bottom: 6px; }
+.m-temp { font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 30px; letter-spacing:-.03em; line-height:1; }
+.m-temp.pending { font-size: 18px; color: var(--text3); }
+.m-diff { font-size: 10px; font-family: 'IBM Plex Mono', monospace; margin-top: 3px; }
+
+/* CONSENSUS */
+.consensus-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px 16px; margin-bottom: 22px;
+}
+.con-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.con-title { font-size: 12px; font-weight: 600; color: var(--text2); }
+.con-spread {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600;
+  padding: 3px 9px; border-radius: 20px;
+}
+.con-spread.tight  { background: var(--green-bg); color: var(--green); }
+.con-spread.medium { background: var(--amber-bg); color: var(--amber); }
+.con-spread.wide   { background: var(--red-bg);   color: var(--red); }
+.con-track {
+  position: relative; height: 8px;
+  background: var(--bg3); border-radius: 4px;
+  margin: 20px 0 22px;
+}
+.con-pin {
+  position: absolute; top: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px; height: 12px;
+  border-radius: 50%; border: 2px solid white;
+  box-shadow: 0 1px 4px rgba(0,0,0,.2);
   cursor: default;
 }
-.bracket-row:hover { border-color: var(--border2); background: var(--bg3); }
-.bracket-row.highlighted { border-color: rgba(0,230,118,0.4); background: rgba(0,230,118,0.05); }
-.bracket-row.model-peak { border-color: rgba(0,212,255,0.4); background: rgba(0,212,255,0.04); }
-.bracket-label {
-  font-family: 'Space Mono', monospace;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text);
-}
-.bracket-bar-wrap { position: relative; height: 8px; background: var(--bg3); border-radius: 4px; overflow: hidden; }
-.bracket-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
-.bracket-price {
-  font-family: 'Space Mono', monospace;
-  font-size: 13px;
-  font-weight: 700;
-  text-align: right;
-}
-.bracket-vol { font-size: 11px; color: var(--text3); text-align: right; font-family: 'Space Mono', monospace; }
-.model-arrow {
-  font-size: 10px;
-  padding: 2px 6px;
-  border-radius: 3px;
-  font-weight: 700;
-  font-family: 'Space Mono', monospace;
-  letter-spacing: 0.03em;
-}
-.model-arrow.yes { background: rgba(0,230,118,0.15); color: var(--green); }
-.model-arrow.no  { background: rgba(255,77,106,0.12); color: var(--red); }
-
-/* WEATHER MODELS */
-.models-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
-  margin-bottom: 20px;
-}
-.model-card {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 12px;
-  text-align: center;
-  transition: all 0.15s;
-}
-.model-card:hover { border-color: var(--border2); }
-.model-card.loading { opacity: 0.5; }
-.model-name {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-weight: 700;
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text2);
-  margin-bottom: 6px;
-}
-.model-temp {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-weight: 900;
-  font-size: 32px;
-  letter-spacing: -0.02em;
-  line-height: 1;
-  color: var(--text);
-}
-.model-temp.loading-val { font-size: 18px; color: var(--text3); }
-.model-temp sup { font-size: 14px; font-weight: 600; }
-.model-conf { font-size: 10px; color: var(--text3); margin-top: 4px; font-family: 'Space Mono', monospace; }
-.model-trend { font-size: 10px; margin-top: 2px; }
-
-/* MODEL CONSENSUS */
-.consensus-bar-wrap { margin-bottom: 24px; }
-.consensus-row {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 14px 16px;
-}
-.consensus-label { font-size: 12px; color: var(--text2); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-.consensus-temp-bar {
-  position: relative;
-  height: 28px;
-  background: var(--bg3);
-  border-radius: 6px;
-  overflow: visible;
-  margin-bottom: 6px;
-}
-.model-pin {
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 3px;
-  height: 28px;
-  border-radius: 2px;
-  cursor: pointer;
-}
-.model-pin-label {
-  position: absolute;
-  top: -18px;
-  left: 50%;
+.con-pin-lbl {
+  position: absolute; bottom: 14px; left: 50%;
   transform: translateX(-50%);
-  font-family: 'Space Mono', monospace;
-  font-size: 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8px; font-weight: 600;
   white-space: nowrap;
-  color: var(--text2);
 }
-.market-range-block {
-  position: absolute;
-  top: 0; bottom: 0;
-  border-radius: 4px;
-  opacity: 0.25;
-}
-.range-label-below {
-  position: absolute;
-  bottom: -16px;
-  font-family: 'Space Mono', monospace;
-  font-size: 8px;
-  color: var(--text3);
-  transform: translateX(-50%);
-}
+.con-axis { display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--text3); margin-top: -18px; }
 
-/* EDGE RATING */
-.edge-box {
+/* EDGE BOX */
+.edge-card {
+  border-radius: 12px; padding: 16px; margin-bottom: 6px;
+  border: 1px solid var(--border); background: var(--bg2);
+}
+.edge-card.strong { border-color: #6ee7b7; background: #f0fdf4; box-shadow: 0 0 0 3px rgba(16,185,129,.08); }
+.edge-card.mild   { border-color: #fcd34d; background: #fffbeb; }
+.edge-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.edge-label { font-family: 'Archivo Narrow', sans-serif; font-weight: 800; font-size: 14px; letter-spacing:.06em; text-transform: uppercase; }
+.edge-num { font-family: 'Archivo', sans-serif; font-weight: 900; font-size: 42px; letter-spacing:-.04em; line-height:1; }
+.edge-num.hi  { color: var(--green); }
+.edge-num.mid { color: var(--amber); }
+.edge-num.lo  { color: var(--text3); }
+.edge-body { font-size: 13px; line-height: 1.6; color: var(--text2); margin-bottom: 10px; }
+.edge-body strong { color: var(--text); }
+.edge-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip {
+  font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 700;
+  padding: 3px 8px; border-radius: 4px; letter-spacing:.03em;
+}
+.chip.hi  { background: var(--green-bg); color: var(--green); }
+.chip.lo  { background: var(--red-bg);   color: var(--red); }
+.chip.neu { background: var(--bg3);      color: var(--text3); }
+
+/* RIGHT / CHAT */
+.right {
+  display: flex; flex-direction: column;
+  height: calc(100vh - 102px);
+  position: sticky; top: 102px;
   background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 20px;
 }
-.edge-box.strong-edge { border-color: rgba(0,230,118,0.5); background: rgba(0,230,118,0.05); box-shadow: var(--glow-green); }
-.edge-box.mild-edge  { border-color: rgba(255,183,77,0.4); background: rgba(255,183,77,0.04); }
-.edge-box.no-edge    { border-color: var(--border); }
-.edge-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.edge-title {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-weight: 800;
-  font-size: 16px;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-.edge-score {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-weight: 900;
-  font-size: 36px;
-  letter-spacing: -0.02em;
-  line-height: 1;
-}
-.edge-score.high { color: var(--green); text-shadow: 0 0 20px rgba(0,230,118,0.4); }
-.edge-score.mid  { color: var(--amber); text-shadow: 0 0 20px rgba(255,183,77,0.4); }
-.edge-score.low  { color: var(--text3); }
-.edge-rec {
-  font-size: 14px;
-  color: var(--text2);
-  line-height: 1.5;
-  margin-bottom: 10px;
-}
-.edge-rec strong { color: var(--text); }
-.edge-breakdown { display: flex; gap: 8px; flex-wrap: wrap; }
-.edge-tag {
-  font-family: 'Space Mono', monospace;
-  font-size: 9px;
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-}
-.edge-tag.yes { background: rgba(0,230,118,0.12); color: var(--green); border: 1px solid rgba(0,230,118,0.2); }
-.edge-tag.no  { background: rgba(255,77,106,0.1); color: var(--red); border: 1px solid rgba(255,77,106,0.15); }
-.edge-tag.neutral { background: var(--bg3); color: var(--text3); border: 1px solid var(--border); }
-
-/* RIGHT PANEL - AI CHAT */
-.right-panel {
-  display: flex;
-  flex-direction: column;
-  height: calc(100vh - 104px);
-  position: sticky;
-  top: 104px;
-}
-.chat-header {
-  padding: 16px 18px;
+.chat-top {
+  padding: 14px 16px;
   border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--bg2);
+  display: flex; align-items: center; gap: 10px;
 }
 .chat-icon {
   width: 32px; height: 32px;
-  background: linear-gradient(135deg, #5b21b6, #7c3aed);
-  border-radius: 8px;
+  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  border-radius: 8px; color: white;
   display: flex; align-items: center; justify-content: center;
-  font-size: 15px;
-  flex-shrink: 0;
+  font-size: 15px; flex-shrink: 0;
 }
-.chat-title { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 16px; letter-spacing: 0.05em; text-transform: uppercase; }
-.chat-subtitle { font-size: 11px; color: var(--text3); margin-top: 1px; }
+.chat-ttl { font-weight: 800; font-size: 14px; letter-spacing:-.01em; }
+.chat-sub { font-size: 11px; color: var(--text3); }
 
-.chat-messages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
+.chat-msgs {
+  flex: 1; overflow-y: auto; padding: 14px;
+  display: flex; flex-direction: column; gap: 10px;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
 }
-.msg {
-  max-width: 90%;
-  font-size: 13px;
-  line-height: 1.6;
-  border-radius: 10px;
-  padding: 10px 13px;
-  animation: msgIn 0.2s ease;
-}
-@keyframes msgIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-.msg.user {
-  align-self: flex-end;
-  background: rgba(0,212,255,0.1);
-  border: 1px solid rgba(0,212,255,0.2);
-  color: var(--text);
-}
-.msg.ai {
-  align-self: flex-start;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  color: var(--text);
-}
-.msg.ai .msg-label {
-  font-family: 'Space Mono', monospace;
-  font-size: 9px;
-  color: var(--purple);
-  letter-spacing: 0.1em;
-  margin-bottom: 5px;
-  text-transform: uppercase;
-}
-.msg.thinking { opacity: 0.6; font-style: italic; }
-.typing-dots { display: inline-flex; gap: 3px; align-items: center; padding: 2px 0; }
-.typing-dots span {
-  width: 5px; height: 5px;
-  border-radius: 50%;
-  background: var(--text3);
-  animation: dot 1.2s ease-in-out infinite;
-}
-.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-@keyframes dot { 0%,80%,100%{transform:scale(0.6);opacity:0.4} 40%{transform:scale(1);opacity:1} }
+.msg { max-width: 92%; font-size: 13px; line-height: 1.6; border-radius: 10px; padding: 10px 13px; animation: msgIn .2s ease; }
+@keyframes msgIn { from{opacity:0;transform:translateY(3px)} to{opacity:1;transform:translateY(0)} }
+.msg.user { align-self: flex-end; background: var(--accent); color: white; }
+.msg.ai   { align-self: flex-start; background: var(--bg3); border: 1px solid var(--border); color: var(--text); }
+.msg-from { font-family:'IBM Plex Mono',monospace; font-size:9px; font-weight:600; color:#7c3aed; letter-spacing:.1em; text-transform:uppercase; margin-bottom:4px; }
+.dots { display:inline-flex; gap:3px; align-items:center; }
+.dots span { width:5px; height:5px; border-radius:50%; background:var(--text3); animation: dot 1.2s ease-in-out infinite; }
+.dots span:nth-child(2){animation-delay:.2s} .dots span:nth-child(3){animation-delay:.4s}
+@keyframes dot{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
 
-.quick-prompts {
-  padding: 10px 16px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  border-top: 1px solid var(--border);
-  background: var(--bg2);
+.quick-row { padding: 8px 12px; display:flex; flex-wrap:wrap; gap:5px; border-top:1px solid var(--border); }
+.qbtn {
+  font-size:11px; padding:5px 10px; border-radius:6px;
+  border:1px solid var(--border); background:var(--bg2); color:var(--text2);
+  cursor:pointer; transition:all .12s; font-family:'Archivo',sans-serif;
 }
-.quick-btn {
-  font-size: 11px;
-  padding: 5px 10px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--bg3);
-  color: var(--text2);
-  cursor: pointer;
-  transition: all 0.12s;
-  font-family: 'Barlow', sans-serif;
-}
-.quick-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,212,255,0.06); }
+.qbtn:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-light); }
 
-.chat-input-wrap {
-  padding: 12px 16px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  gap: 8px;
-  background: var(--bg2);
+.chat-foot { padding:10px 12px; border-top:1px solid var(--border); display:flex; gap:8px; }
+.chat-in {
+  flex:1; background:var(--bg3); border:1px solid var(--border);
+  border-radius:8px; padding:8px 12px; color:var(--text);
+  font-family:'Archivo',sans-serif; font-size:13px; outline:none;
+  resize:none; height:38px; min-height:38px; max-height:90px; transition:border-color .15s;
 }
-.chat-input {
-  flex: 1;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 9px 13px;
-  color: var(--text);
-  font-family: 'Barlow', sans-serif;
-  font-size: 13px;
-  outline: none;
-  resize: none;
-  height: 38px;
-  min-height: 38px;
-  max-height: 100px;
-  transition: border-color 0.15s;
+.chat-in:focus { border-color:var(--accent); background:white; }
+.chat-in::placeholder { color:var(--text3); }
+.send {
+  width:38px; height:38px; background:var(--accent); border:none;
+  border-radius:8px; color:white; font-size:16px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  transition:all .12s;
 }
-.chat-input:focus { border-color: var(--accent); }
-.chat-input::placeholder { color: var(--text3); }
-.send-btn {
-  width: 38px; height: 38px;
-  background: var(--accent);
-  border: none;
-  border-radius: 8px;
-  color: var(--bg);
-  font-size: 16px;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.12s;
-  flex-shrink: 0;
-}
-.send-btn:hover { background: #00eeff; box-shadow: 0 0 12px rgba(0,212,255,0.4); }
-.send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.send:hover { background:#1447c0; }
+.send:disabled { opacity:.4; cursor:not-allowed; }
 
-/* LOADING STATE */
-.skeleton { background: linear-gradient(90deg, var(--bg2) 25%, var(--bg3) 50%, var(--bg2) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 6px; }
-@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-
-/* TOAST */
-.toast {
-  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-  background: var(--bg3); border: 1px solid var(--border2);
-  padding: 9px 16px; border-radius: 8px;
-  font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text2);
-  opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 999;
-  white-space: nowrap;
+/* ERROR BANNER */
+.err-banner {
+  background: var(--red-bg); border: 1px solid #fca5a5; border-radius: 9px;
+  padding: 10px 14px; margin-bottom: 16px; font-size: 12px; color: var(--red);
+  display: flex; gap: 8px; line-height: 1.5;
 }
-.toast.show { opacity: 1; }
 
-/* SCROLLBARS */
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+.toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--text); color:white; font-family:'IBM Plex Mono',monospace; font-size:11px; padding:8px 16px; border-radius:8px; opacity:0; transition:opacity .2s; pointer-events:none; z-index:999; white-space:nowrap; }
+.toast.show { opacity:1; }
 
-/* MOBILE */
-@media(max-width: 900px) {
-  .main { grid-template-columns: 1fr; }
-  .right-panel { height: 500px; position: static; border-top: 1px solid var(--border); }
-  .models-grid { grid-template-columns: repeat(3, 1fr); }
-  .left-panel { padding: 16px; }
+::-webkit-scrollbar{width:5px;height:5px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+@media(max-width:900px){
+  .main{grid-template-columns:1fr}
+  .right{height:480px;position:static;border-top:1px solid var(--border)}
+  .models-row{grid-template-columns:repeat(3,1fr)}
 }
-@media(max-width: 540px) {
-  .models-grid { grid-template-columns: repeat(2, 1fr); }
-  header { padding: 0 14px; }
-  .city-bar { padding: 0 10px; }
+@media(max-width:520px){
+  .models-row{grid-template-columns:repeat(2,1fr)}
+  header{padding:0 14px} .city-bar{padding:0 10px}
+  .left{padding:14px}
 }
 </style>
 </head>
@@ -509,56 +301,51 @@ header {
 
 <header>
   <div class="logo">
-    <div class="logo-icon">🌡</div>
-    Weather<span>Edge</span>
+    <div class="logo-mark">🌡</div>
+    <div class="logo-text">Weather<span>Edge</span></div>
   </div>
-  <div class="header-right">
-    <div class="status-pill loading" id="statusPill">
-      <div class="status-dot"></div>
-      <span id="statusText">Loading...</span>
-    </div>
+  <div class="status-chip loading" id="statusChip">
+    <div class="s-dot"></div>
+    <span id="statusTxt">Loading...</span>
   </div>
 </header>
 
 <div class="city-bar" id="cityBar">
-  <!-- tabs injected by JS -->
+  <!-- injected -->
 </div>
 
 <div class="main">
-  <div class="left-panel" id="leftPanel">
-    <div style="display:flex;align-items:center;justify-content:center;height:300px;color:var(--text3);font-family:'Space Mono',monospace;font-size:12px">
-      Fetching markets from Kalshi...
+  <div class="left" id="leftPanel">
+    <div style="display:flex;align-items:center;justify-content:center;height:300px;color:var(--text3);font-family:'IBM Plex Mono',monospace;font-size:12px;gap:8px">
+      <div class="dots"><span></span><span></span><span></span></div> Fetching markets...
     </div>
   </div>
 
-  <div class="right-panel">
-    <div class="chat-header">
+  <div class="right">
+    <div class="chat-top">
       <div class="chat-icon">✦</div>
       <div>
-        <div class="chat-title">AI Analyst</div>
-        <div class="chat-subtitle">Ask anything about this market</div>
+        <div class="chat-ttl">AI Analyst</div>
+        <div class="chat-sub">Powered by Claude · Market + Model data loaded</div>
       </div>
     </div>
-
-    <div class="chat-messages" id="chatMessages">
+    <div class="chat-msgs" id="chatMsgs">
       <div class="msg ai">
-        <div class="msg-label">WeatherEdge AI</div>
-        Hi! I'm analyzing the Kalshi temperature markets alongside the GFS, ECMWF, NAM, GEM, and ICON model forecasts. Select a city above and I'll help you find edge — or just ask me anything.
+        <div class="msg-from">WeatherEdge AI</div>
+        Hi! I have the Kalshi temperature market brackets and all 5 weather model forecasts loaded for whatever city you're viewing. Ask me where the edge is, which bracket to bet, or anything else.
       </div>
     </div>
-
-    <div class="quick-prompts" id="quickPrompts">
-      <button class="quick-btn" onclick="quickAsk('Where is the best edge right now?')">Best edge now?</button>
-      <button class="quick-btn" onclick="quickAsk('Which models agree and which disagree?')">Model agreement?</button>
-      <button class="quick-btn" onclick="quickAsk('What bracket should I bet on?')">Best bracket?</button>
-      <button class="quick-btn" onclick="quickAsk('Explain the confidence rating')">Explain rating</button>
+    <div class="quick-row">
+      <button class="qbtn" onclick="quickAsk('Where is the best edge right now?')">Best edge?</button>
+      <button class="qbtn" onclick="quickAsk('Which models agree and which disagree for this city?')">Model agreement?</button>
+      <button class="qbtn" onclick="quickAsk('Which bracket should I bet on and which side?')">Best bracket?</button>
+      <button class="qbtn" onclick="quickAsk('How confident are you in this edge?')">Confidence?</button>
     </div>
-
-    <div class="chat-input-wrap">
-      <textarea class="chat-input" id="chatInput" placeholder="Ask about edge, models, brackets..." rows="1"
+    <div class="chat-foot">
+      <textarea class="chat-in" id="chatIn" placeholder="Ask about edge, models, brackets..."
         onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"
-        oninput="this.style.height='38px';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
-      <button class="send-btn" id="sendBtn" onclick="sendChat()">↑</button>
+        oninput="this.style.height='38px';this.style.height=Math.min(this.scrollHeight,90)+'px'"></textarea>
+      <button class="send" id="sendBtn" onclick="sendChat()">↑</button>
     </div>
   </div>
 </div>
@@ -566,509 +353,458 @@ header {
 <div class="toast" id="toast"></div>
 
 <script>
-// ─── CITY CONFIG ────────────────────────────────────────────────────────────
-// NWS stations matched to Open-Meteo lat/lon
+// ── CITY CONFIG ─────────────────────────────────────────────────────────────
 const CITIES = [
-  { series:'KXHIGHNY',  name:'New York',     short:'NYC', lat:40.7789, lon:-73.9692 }, // Central Park
-  { series:'KXHIGHCHI', name:'Chicago',       short:'CHI', lat:41.7861, lon:-87.7522 }, // Midway
-  { series:'KXHIGHMIA', name:'Miami',         short:'MIA', lat:25.7959, lon:-80.2870 }, // MIA Airport
-  { series:'KXHIGHLAX', name:'Los Angeles',   short:'LAX', lat:33.9425, lon:-118.4081 }, // LAX
-  { series:'KXHIGHAUS', name:'Austin',        short:'AUS', lat:30.1975, lon:-97.6664 }, // AUS Airport
-  { series:'KXHIGHBOS', name:'Boston',        short:'BOS', lat:42.3601, lon:-71.0589 },
-  { series:'KXHIGHDEN', name:'Denver',        short:'DEN', lat:39.8561, lon:-104.6737 },
-  { series:'KXHIGHHOU', name:'Houston',       short:'HOU', lat:29.9902, lon:-95.3368 },
-  { series:'KXHIGHPHX', name:'Phoenix',       short:'PHX', lat:33.4373, lon:-112.0078 },
-  { series:'KXHIGHSEA', name:'Seattle',       short:'SEA', lat:47.4502, lon:-122.3088 },
-  { series:'KXHIGHORD', name:'Chicago O\'Hare',short:'ORD',lat:41.9742, lon:-87.9073 },
-  { series:'KXHIGHATL', name:'Atlanta',       short:'ATL', lat:33.6407, lon:-84.4277 },
-  { series:'KXHIGHDFW', name:'Dallas',        short:'DFW', lat:32.8998, lon:-97.0403 },
-  { series:'KXHIGHSLC', name:'Salt Lake City',short:'SLC', lat:40.7862, lon:-111.9822 },
-  { series:'KXHIGHPHL', name:'Philadelphia',  short:'PHL', lat:39.8721, lon:-75.2411 },
-  { series:'KXHIGHDC',  name:'Washington DC', short:'DCA', lat:38.8512, lon:-77.0402 },
-  { series:'KXHIGHMSP', name:'Minneapolis',   short:'MSP', lat:44.8848, lon:-93.2223 },
-  { series:'KXHIGHSTL', name:'St. Louis',     short:'STL', lat:38.7487, lon:-90.3700 },
-  { series:'KXHIGHDET', name:'Detroit',       short:'DTW', lat:42.2124, lon:-83.3534 },
-  { series:'KXHIGHSAN', name:'San Diego',     short:'SAN', lat:32.7338, lon:-117.1933 },
-  { series:'KXHIGHMCO', name:'Orlando',       short:'MCO', lat:28.4312, lon:-81.3081 },
+  { series:'KXHIGHNY',  name:'New York',      short:'NYC', lat:40.7789,  lon:-73.9692  },
+  { series:'KXHIGHCHI', name:'Chicago',        short:'CHI', lat:41.8827,  lon:-87.6233  },
+  { series:'KXHIGHMIA', name:'Miami',          short:'MIA', lat:25.7617,  lon:-80.1918  },
+  { series:'KXHIGHLAX', name:'Los Angeles',    short:'LAX', lat:34.0522,  lon:-118.2437 },
+  { series:'KXHIGHAUS', name:'Austin',         short:'AUS', lat:30.2672,  lon:-97.7431  },
+  { series:'KXHIGHBOS', name:'Boston',         short:'BOS', lat:42.3601,  lon:-71.0589  },
+  { series:'KXHIGHDEN', name:'Denver',         short:'DEN', lat:39.7392,  lon:-104.9903 },
+  { series:'KXHIGHHOU', name:'Houston',        short:'HOU', lat:29.7604,  lon:-95.3698  },
+  { series:'KXHIGHPHX', name:'Phoenix',        short:'PHX', lat:33.4484,  lon:-112.0740 },
+  { series:'KXHIGHSEA', name:'Seattle',        short:'SEA', lat:47.6062,  lon:-122.3321 },
+  { series:'KXHIGHATL', name:'Atlanta',        short:'ATL', lat:33.7490,  lon:-84.3880  },
+  { series:'KXHIGHDFW', name:'Dallas',         short:'DFW', lat:32.7767,  lon:-96.7970  },
+  { series:'KXHIGHSLC', name:'Salt Lake City', short:'SLC', lat:40.7608,  lon:-111.8910 },
+  { series:'KXHIGHPHL', name:'Philadelphia',   short:'PHL', lat:39.9526,  lon:-75.1652  },
+  { series:'KXHIGHDC',  name:'Washington DC',  short:'DC',  lat:38.9072,  lon:-77.0369  },
+  { series:'KXHIGHMSP', name:'Minneapolis',    short:'MSP', lat:44.9778,  lon:-93.2650  },
+  { series:'KXHIGHSTL', name:'St. Louis',      short:'STL', lat:38.6270,  lon:-90.1994  },
+  { series:'KXHIGHDET', name:'Detroit',        short:'DET', lat:42.3314,  lon:-83.0458  },
+  { series:'KXHIGHSAN', name:'San Diego',      short:'SAN', lat:32.7157,  lon:-117.1611 },
+  { series:'KXHIGHMCO', name:'Orlando',        short:'MCO', lat:28.5383,  lon:-81.3792  },
+  { series:'KXHIGHORD', name:'Chicago O\'Hare',short:'ORD', lat:41.9742,  lon:-87.9073  },
 ];
 
-const MODEL_CONFIGS = [
-  { id:'gfs',   name:'GFS',   color:'#00d4ff', param:'best_match' },
-  { id:'ecmwf', name:'ECMWF', color:'#b388ff', param:'ecmwf_ifs025' },
-  { id:'nam',   name:'NAM',   color:'#00e676', param:'ncep_gfs013' },   // NAM-like
-  { id:'gem',   name:'GEM',   color:'#ffb74d', param:'gem_seamless' },
-  { id:'icon',  name:'ICON',  color:'#ff4d6a', param:'icon_seamless' },
+const MODELS = [
+  { id:'gfs',   name:'GFS',   color:'#1a56db', model:'best_match'     },
+  { id:'ecmwf', name:'ECMWF', color:'#7c3aed', model:'ecmwf_ifs025'   },
+  { id:'nam',   name:'NAM',   color:'#0d7a3e', model:'ncep_nam_conus' },
+  { id:'gem',   name:'GEM',   color:'#92400e', model:'gem_seamless'    },
+  { id:'icon',  name:'ICON',  color:'#c81e1e', model:'icon_seamless'   },
 ];
 
-// ─── STATE ──────────────────────────────────────────────────────────────────
-let activeCityIdx = 0;
-let cityMarkets = {};       // series → {markets, loaded}
-let cityWeather = {};       // series → {models: {id → tempF}}
-let chatHistory = [];
-let aiThinking = false;
+// ── STATE ────────────────────────────────────────────────────────────────────
+let activeSeries = CITIES[0].series;
+let mktCache = {};   // series → { markets:[], loaded:bool, error? }
+let wxCache  = {};   // series → { gfs:xx, ecmwf:xx, ... }
+let chatHist = [];
+let aiWorking = false;
 
-const PROXY = '/api/proxy';
-
-// ─── KALSHI API ─────────────────────────────────────────────────────────────
+// ── KALSHI FETCH ─────────────────────────────────────────────────────────────
 async function kalshi(path, params = {}) {
   const qs = new URLSearchParams(params).toString();
-  const url = `${PROXY}?path=${encodeURIComponent(path)}${qs ? '&' + qs : ''}`;
+  // Pass path and extra query params separately
+  const url = `/api/proxy?path=${encodeURIComponent(path)}${qs ? '&' + qs : ''}`;
   const r = await fetch(url);
-  if (!r.ok) throw new Error(`Kalshi ${path}: ${r.status}`);
+  if (!r.ok) {
+    const txt = await r.text();
+    throw new Error(`Kalshi ${r.status}: ${txt.slice(0,120)}`);
+  }
   return r.json();
 }
 
-async function loadCityMarket(city) {
-  if (cityMarkets[city.series]?.loaded) return;
+async function fetchMarkets(city) {
+  if (mktCache[city.series]?.loaded) return;
   try {
-    const data = await kalshi('/markets', {
-      series_ticker: city.series,
-      status: 'open',
-      limit: 50
-    });
-    cityMarkets[city.series] = { markets: data.markets || [], loaded: true };
+    const data = await kalshi('/markets', { series_ticker: city.series, status: 'open', limit: 50 });
+    mktCache[city.series] = { markets: data.markets || [], loaded: true };
   } catch(e) {
-    cityMarkets[city.series] = { markets: [], loaded: true, error: e.message };
+    console.error('Markets error:', e);
+    mktCache[city.series] = { markets: [], loaded: true, error: e.message };
   }
 }
 
-// ─── OPEN-METEO ─────────────────────────────────────────────────────────────
-async function loadWeatherModels(city) {
-  if (cityWeather[city.series]) return;
-
+// ── OPEN-METEO ───────────────────────────────────────────────────────────────
+async function fetchWeather(city) {
+  if (wxCache[city.series]) return;
   const today = new Date().toISOString().split('T')[0];
   const results = {};
 
-  await Promise.all(MODEL_CONFIGS.map(async model => {
+  await Promise.all(MODELS.map(async m => {
     try {
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&daily=temperature_2m_max&temperature_unit=fahrenheit&forecast_days=1&models=${model.param}&timezone=auto&start_date=${today}&end_date=${today}`;
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&daily=temperature_2m_max&temperature_unit=fahrenheit&forecast_days=3&models=${m.model}&timezone=auto&start_date=${today}&end_date=${today}`;
       const r = await fetch(url);
       const d = await r.json();
-      const tempC = d.daily?.temperature_2m_max?.[0];
-      results[model.id] = tempC != null ? Math.round(tempC * 10) / 10 : null;
-    } catch(_) {
-      results[model.id] = null;
-    }
+      const v = d.daily?.temperature_2m_max?.[0];
+      results[m.id] = (v != null) ? Math.round(v * 10) / 10 : null;
+    } catch(_) { results[m.id] = null; }
   }));
 
-  cityWeather[city.series] = results;
+  wxCache[city.series] = results;
 }
 
-// ─── RENDER ──────────────────────────────────────────────────────────────────
-function renderCityTabs(activeSeries) {
-  const bar = document.getElementById('cityBar');
-  // Only show cities that have open markets
-  const toShow = CITIES.filter(c => !cityMarkets[c.series] || cityMarkets[c.series].markets?.length > 0);
-  if (toShow.length === 0) {
-    bar.innerHTML = CITIES.slice(0, 10).map((c, i) => tabHTML(c, i === 0)).join('');
-    return;
-  }
-  bar.innerHTML = toShow.map((c, i) => {
-    const hasEdge = computeEdge(c) > 55;
-    return tabHTML(c, c.series === activeSeries, hasEdge);
-  }).join('');
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+function parseDollarsToPercent(dolStr) {
+  // yes_bid_dollars = "0.56" → 56¢
+  const v = parseFloat(dolStr);
+  return isNaN(v) ? null : Math.round(v * 100);
 }
 
-function tabHTML(city, active, edge = false) {
-  return `<div class="city-tab ${active ? 'active' : ''}" onclick="selectCity('${city.series}')">
-    ${city.short}${edge ? '<span class="edge-dot"></span>' : ''}
-  </div>`;
+function getBracketPrice(m) {
+  // Prefer yes_bid over last_price
+  const v = parseDollarsToPercent(m.yes_bid_dollars) ??
+            parseDollarsToPercent(m.last_price_dollars) ??
+            m.yes_price ?? 0;
+  return v;
 }
 
-function renderLeft(city) {
-  const mkt = cityMarkets[city.series];
-  const wx = cityWeather[city.series];
-  const panel = document.getElementById('leftPanel');
-
-  if (!mkt?.loaded) {
-    panel.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:300px;color:var(--text3);font-family:'Space Mono',monospace;font-size:12px">Loading ${city.name}...</div>`;
-    return;
-  }
-
-  if (!mkt.markets?.length) {
-    panel.innerHTML = `<div style="padding:40px;text-align:center;color:var(--text3);font-family:'Space Mono',monospace;font-size:12px">No open markets for ${city.name} today</div>`;
-    return;
-  }
-
-  const markets = mkt.markets;
-  const modelData = wx || {};
-  const modelTemps = MODEL_CONFIGS.map(m => modelData[m.id]).filter(v => v != null);
-  const modelAvg = modelTemps.length ? modelTemps.reduce((a,b)=>a+b,0)/modelTemps.length : null;
-  const edge = computeEdge(city);
-
-  // Get today's date
-  const today = new Date();
-  const dateStr = today.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
-
-  panel.innerHTML = `
-    <div class="market-header">
-      <div>
-        <div class="market-title">Highest Temp · ${city.name}</div>
-        <div class="market-subtitle">NWS Daily Climate Report · Settles next morning</div>
-      </div>
-      <div class="market-date">${dateStr}</div>
-    </div>
-
-    <div class="section-label">Kalshi Market Brackets</div>
-    <div class="brackets-wrap">
-      <div class="brackets-grid" id="bracketsGrid">
-        ${renderBrackets(markets, modelAvg)}
-      </div>
-    </div>
-
-    <div class="section-label">Weather Model Forecasts</div>
-    <div class="models-grid">
-      ${MODEL_CONFIGS.map(m => renderModelCard(m, modelData[m.id], modelAvg)).join('')}
-    </div>
-
-    ${modelTemps.length > 1 ? renderConsensusBar(markets, modelData) : ''}
-
-    <div class="section-label">Edge Analysis</div>
-    ${renderEdgeBox(city, markets, modelData, edge)}
-  `;
-}
-
-function renderBrackets(markets, modelAvg) {
-  // Sort by yes_price desc to find the leading bracket
-  const sorted = [...markets].sort((a,b) => (b.yes_price||0) - (a.yes_price||0));
-  const maxPrice = sorted[0]?.yes_price || 1;
-
-  return markets.map(m => {
-    const price = m.yes_price || 0;
-    const width = Math.round((price / 100) * 100);
-    const barColor = price > 50 ? '#00d4ff' : price > 25 ? '#7a92b0' : '#243447';
-    const isModelPeak = modelAvg != null && m.subtitle && bracketContains(m, modelAvg);
-    const isHigh = price >= 40;
-
-    // Try to extract temp range from title for model arrow
-    let modelArrow = '';
-    if (modelAvg != null && m.subtitle) {
-      const inBracket = bracketContains(m, modelAvg);
-      if (inBracket) modelArrow = `<span class="model-arrow yes">◀ MODELS</span>`;
-    }
-
-    return `<div class="bracket-row ${isHigh?'highlighted':''} ${isModelPeak?'model-peak':''}">
-      <div class="bracket-label">${m.subtitle || m.title?.replace(/.*highest.*temperature.*in.*today\??/i,'').trim() || m.ticker}</div>
-      <div class="bracket-bar-wrap">
-        <div class="bracket-bar-fill" style="width:${width}%;background:${barColor}"></div>
-      </div>
-      <div class="bracket-price" style="color:${price>50?'var(--accent)':price>25?'var(--text)':'var(--text3)'}">${price}¢</div>
-      ${modelArrow ? `<div>${modelArrow}</div>` : `<div class="bracket-vol">${(m.volume||0).toLocaleString()}</div>`}
-    </div>`;
-  }).join('');
-}
-
-function bracketContains(market, tempF) {
-  // Try to parse range from subtitle like "72-73°F" or "≥90°F" or "<50°F"
-  const s = market.subtitle || market.title || '';
-  const rangeMatch = s.match(/(\d+)\s*[-–]\s*(\d+)/);
-  if (rangeMatch) {
-    const lo = parseInt(rangeMatch[1]), hi = parseInt(rangeMatch[2]);
-    return tempF >= lo && tempF <= hi;
-  }
-  const geMatch = s.match(/[≥>=]+\s*(\d+)/);
-  if (geMatch) return tempF >= parseInt(geMatch[1]);
-  const leMatch = s.match(/[≤<=]+\s*(\d+)/);
-  if (leMatch) return tempF <= parseInt(leMatch[1]);
+function bracketMatchesTemp(market, tempF) {
+  const s = (market.subtitle || market.yes_sub_title || market.title || '').toLowerCase();
+  // patterns: "72-73", "≥90", "< 50", "between 68 and 72", "at least 80"
+  const range = s.match(/(\d+)\s*[-–to]+\s*(\d+)/);
+  if (range) { const lo=+range[1], hi=+range[2]; return tempF>=lo && tempF<=hi; }
+  const ge = s.match(/(?:at least|≥|>=|>)\s*(\d+)/);
+  if (ge) return tempF >= +ge[1];
+  const le = s.match(/(?:at most|below|≤|<=|<)\s*(\d+)/);
+  if (le) return tempF < +le[1];
   return false;
 }
 
-function renderModelCard(model, tempF, avg) {
-  const isHigh = tempF != null && avg != null && tempF > avg + 1;
-  const isLow  = tempF != null && avg != null && tempF < avg - 1;
-  const trend = isHigh ? '↑ warmer' : isLow ? '↓ cooler' : '≈ avg';
-  const trendColor = isHigh ? 'var(--red)' : isLow ? 'var(--accent)' : 'var(--text3)';
+function modelAvg(series) {
+  const vals = MODELS.map(m => wxCache[series]?.[m.id]).filter(v => v != null);
+  return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+}
+function modelSpread(series) {
+  const vals = MODELS.map(m => wxCache[series]?.[m.id]).filter(v => v != null);
+  return vals.length > 1 ? Math.max(...vals) - Math.min(...vals) : null;
+}
 
-  return `<div class="model-card">
-    <div class="model-name" style="color:${model.color}">${model.name}</div>
-    ${tempF != null
-      ? `<div class="model-temp">${Math.round(tempF)}<sup>°</sup></div>
-         <div class="model-trend" style="color:${trendColor}">${trend}</div>`
-      : `<div class="model-temp loading-val">—</div>
-         <div class="model-conf">loading</div>`
-    }
+// ── EDGE SCORE ────────────────────────────────────────────────────────────────
+function edgeScore(city) {
+  const avg = modelAvg(city.series);
+  const spread = modelSpread(city.series);
+  const mkts = mktCache[city.series]?.markets;
+  if (avg == null || !mkts?.length) return 0;
+
+  const target = mkts.find(m => bracketMatchesTemp(m, avg));
+  if (!target) return 5;
+
+  const price = getBracketPrice(target);
+  const consensus = Math.max(0, 100 - (spread ?? 10) * 6);
+  const mismatch = Math.abs(consensus - price);
+  return Math.min(99, Math.round(mismatch * 1.1 + (spread != null && spread < 2 ? 12 : 0)));
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function renderTabs() {
+  const bar = document.getElementById('cityBar');
+  bar.innerHTML = CITIES.map(c => {
+    const hasEdge = edgeScore(c) > 45;
+    const loaded  = mktCache[c.series]?.loaded;
+    const hasData = mktCache[c.series]?.markets?.length > 0;
+    const show    = !loaded || hasData; // show if not loaded yet or has markets
+    if (!show) return '';
+    return `<div class="city-tab${c.series===activeSeries?' active':''}" onclick="selectCity('${c.series}')">
+      ${c.short}${hasEdge?'<span class="edge-pip"></span>':''}
+    </div>`;
+  }).join('');
+}
+
+function renderLeft() {
+  const city = CITIES.find(c => c.series === activeSeries);
+  const mk = mktCache[city.series];
+  const wx = wxCache[city.series];
+  const panel = document.getElementById('leftPanel');
+
+  if (!mk?.loaded) {
+    panel.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:300px;color:var(--text3);font-family:'IBM Plex Mono',monospace;font-size:12px;gap:8px"><div class="dots"><span></span><span></span><span></span></div> Loading ${city.name}...</div>`;
+    return;
+  }
+
+  if (mk.error) {
+    panel.innerHTML = `<div class="err-banner">⚠ Could not load markets: ${mk.error}</div>`;
+    return;
+  }
+
+  if (!mk.markets.length) {
+    panel.innerHTML = `<div style="padding:48px;text-align:center;color:var(--text3);font-family:'IBM Plex Mono',monospace;font-size:12px">No open temperature markets for ${city.name} today.<br><br>Markets typically open the morning of the trading day.</div>`;
+    return;
+  }
+
+  const markets = [...mk.markets].sort((a,b) => getBracketPrice(b) - getBracketPrice(a));
+  const avg     = modelAvg(city.series);
+  const spread  = modelSpread(city.series);
+  const score   = edgeScore(city);
+  const today   = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+
+  panel.innerHTML = `
+    <div class="mkt-top">
+      <div>
+        <div class="mkt-city">High Temp · ${city.name}</div>
+        <div class="mkt-sub">Kalshi daily temperature market · NWS settlement</div>
+      </div>
+      <div class="mkt-date">${today}</div>
+    </div>
+
+    <div class="section-head">Kalshi Market Brackets</div>
+    <div class="brackets">${markets.map(m => renderBracket(m, avg)).join('')}</div>
+
+    <div class="section-head">Weather Model Forecasts</div>
+    <div class="models-row">${MODELS.map(m => renderModelCard(m, wx, avg)).join('')}</div>
+
+    ${avg != null && spread != null ? renderConsensus(wx, markets) : ''}
+
+    <div class="section-head">Edge Analysis</div>
+    ${renderEdge(city, markets, wx, score)}
+  `;
+}
+
+function renderBracket(m, modelAvgTemp) {
+  const price   = getBracketPrice(m);
+  const label   = m.subtitle || m.yes_sub_title || m.title?.replace(/will.*?be/i,'').trim() || m.ticker;
+  const width   = Math.max(2, price);
+  const isPeak  = modelAvgTemp != null && bracketMatchesTemp(m, modelAvgTemp);
+  const isTop   = price >= 40;
+  const barClr  = price > 50 ? '#1a56db' : price > 25 ? '#6b7280' : '#d1d5db';
+  const priceClr= price > 50 ? 'var(--accent)' : price > 25 ? 'var(--text)' : 'var(--text3)';
+
+  let tag = '';
+  if (isPeak)  tag = `<span class="b-tag models-here">◀ MODELS</span>`;
+  else if (isTop) tag = `<span class="b-tag top-mkt">LEADER</span>`;
+  else         tag = `<span class="b-tag vol">${(parseFloat(m.volume_fp)||0).toFixed(0)} vol</span>`;
+
+  return `<div class="bracket-row${isPeak?' is-peak':''}${isTop&&!isPeak?' is-leader':''}">
+    <div class="b-label" title="${label}">${label}</div>
+    <div class="b-track"><div class="b-fill" style="width:${width}%;background:${barClr}"></div></div>
+    <div class="b-price" style="color:${priceClr}">${price}¢</div>
+    ${tag}
   </div>`;
 }
 
-function renderConsensusBar(markets, modelData) {
-  const temps = MODEL_CONFIGS.map(m => ({ ...m, val: modelData[m.id] })).filter(m => m.val != null);
-  if (!temps.length) return '';
+function renderModelCard(model, wx, avg) {
+  const v = wx?.[model.id];
+  const diff = (v != null && avg != null) ? v - avg : null;
+  const isHigh = diff != null && diff > 1.5;
+  const isLow  = diff != null && diff < -1.5;
+  const diffStr = diff != null ? (diff > 0 ? `+${diff.toFixed(1)}°` : `${diff.toFixed(1)}°`) : '';
+  const diffClr = isHigh ? 'var(--red)' : isLow ? 'var(--accent)' : 'var(--text3)';
 
-  const allVals = temps.map(t => t.val);
-  const minT = Math.min(...allVals) - 3;
-  const maxT = Math.max(...allVals) + 3;
-  const range = maxT - minT;
-  const spread = Math.max(...allVals) - Math.min(...allVals);
+  return `<div class="model-card${isHigh?' is-high':isLow?' is-low':''}">
+    <div class="m-name" style="color:${model.color}">${model.name}</div>
+    ${v != null
+      ? `<div class="m-temp">${Math.round(v)}°</div><div class="m-diff" style="color:${diffClr}">${diff != null ? diffStr : '—'}</div>`
+      : `<div class="m-temp pending">—</div><div class="m-diff" style="color:var(--text3)">loading</div>`}
+  </div>`;
+}
 
-  const pins = temps.map(m => {
-    const pct = ((m.val - minT) / range) * 100;
-    return `<div class="model-pin" style="left:${pct}%;background:${m.color};opacity:0.9" title="${m.name}: ${m.val}°F">
-      <span class="model-pin-label" style="color:${m.color}">${m.name}</span>
+function renderConsensus(wx, markets) {
+  const pins = MODELS.map(m => ({ ...m, v: wx?.[m.id] })).filter(p => p.v != null);
+  if (pins.length < 2) return '';
+  const vals = pins.map(p => p.v);
+  const lo = Math.min(...vals) - 2, hi = Math.max(...vals) + 2;
+  const spread = Math.max(...vals) - Math.min(...vals);
+  const spreadCls = spread < 2 ? 'tight' : spread < 5 ? 'medium' : 'wide';
+  const spreadLbl = spread < 2 ? `${spread.toFixed(1)}° — Strong consensus` : spread < 5 ? `${spread.toFixed(1)}° — Moderate spread` : `${spread.toFixed(1)}° — Wide disagreement`;
+
+  const pinHTML = pins.map(p => {
+    const pct = ((p.v - lo) / (hi - lo)) * 100;
+    return `<div class="con-pin" style="left:${pct}%;background:${p.color}" title="${p.name}: ${p.v}°F">
+      <span class="con-pin-lbl" style="color:${p.color}">${p.name}</span>
     </div>`;
   }).join('');
-
-  const spreadLabel = spread < 2 ? 'Strong consensus' : spread < 5 ? 'Moderate spread' : 'Wide disagreement';
-  const spreadColor = spread < 2 ? 'var(--green)' : spread < 5 ? 'var(--amber)' : 'var(--red)';
 
   return `
-    <div class="section-label">Model Consensus</div>
-    <div class="consensus-bar-wrap">
-      <div class="consensus-row">
-        <div class="consensus-label">
-          <span>Temperature spread across models</span>
-          <span style="color:${spreadColor};font-family:'Space Mono',monospace;font-size:10px">${spreadLabel} · ${spread.toFixed(1)}°F spread</span>
-        </div>
-        <div class="consensus-temp-bar" style="margin: 20px 8px 24px">
-          <div style="position:absolute;top:50%;left:0;right:0;height:2px;background:var(--border);transform:translateY(-50%)"></div>
-          ${pins}
-          <span class="range-label-below" style="left:0">${Math.round(minT+3)}°</span>
-          <span class="range-label-below" style="left:50%;transform:translateX(-50%)">${Math.round((minT+3+maxT-3)/2)}°</span>
-          <span class="range-label-below" style="left:100%;transform:translateX(-100%)">${Math.round(maxT-3)}°</span>
-        </div>
+    <div class="section-head">Model Consensus</div>
+    <div class="consensus-card">
+      <div class="con-header">
+        <span class="con-title">Where each model puts the high today</span>
+        <span class="con-spread ${spreadCls}">${spreadLbl}</span>
       </div>
+      <div class="con-track">${pinHTML}</div>
+      <div class="con-axis"><span>${Math.round(lo+2)}°F</span><span>${Math.round((lo+hi)/2)}°F</span><span>${Math.round(hi-2)}°F</span></div>
     </div>`;
 }
 
-function computeEdge(city) {
-  const wx = cityWeather[city.series];
-  const mkt = cityMarkets[city.series];
-  if (!wx || !mkt?.markets?.length) return 0;
+function renderEdge(city, markets, wx, score) {
+  const avg = modelAvg(city.series);
+  const spread = modelSpread(city.series);
+  if (avg == null) return `<div class="edge-card"><div class="edge-body">Loading model data...</div></div>`;
 
-  const temps = Object.values(wx).filter(v => v != null);
-  if (!temps.length) return 0;
+  const target = markets.find(m => bracketMatchesTemp(m, avg));
+  const price  = target ? getBracketPrice(target) : null;
+  const cls    = score > 55 ? 'strong' : score > 30 ? 'mild' : '';
+  const numCls = score > 55 ? 'hi' : score > 30 ? 'mid' : 'lo';
+  const agreeCount = MODELS.filter(m => {
+    const v = wx?.[m.id];
+    return v != null && avg != null && Math.abs(v - avg) < 2;
+  }).length;
 
-  const modelAvg = temps.reduce((a,b)=>a+b,0)/temps.length;
-  const spread = Math.max(...temps) - Math.min(...temps);
-  const consensus = Math.max(0, 100 - spread * 8); // tighter spread = more confidence
-
-  // Find which bracket models point to
-  let targetBracket = null, targetPrice = 0;
-  for (const m of mkt.markets) {
-    if (bracketContains(m, modelAvg)) {
-      targetBracket = m;
-      targetPrice = m.yes_price || 0;
-      break;
+  let body = '';
+  if (target && price != null) {
+    if (score > 55 && price < 40) {
+      body = `Models average <strong>${Math.round(avg)}°F</strong> — pointing to <strong>${target.subtitle||target.ticker}</strong>, currently priced at just <strong>${price}¢</strong>. Models suggest this is underpriced. Consider <strong style="color:var(--green)">YES</strong>.`;
+    } else if (score > 55 && price > 60) {
+      body = `Models average <strong>${Math.round(avg)}°F</strong> but this bracket is priced at <strong>${price}¢</strong>. Possible overpricing. Consider <strong style="color:var(--red)">NO</strong> on <strong>${target.subtitle||target.ticker}</strong>.`;
+    } else if (score > 30) {
+      body = `Mild signal. Models cluster around <strong>${Math.round(avg)}°F</strong> (${spread?.toFixed(1)}° spread). Target bracket <strong>${target.subtitle||target.ticker}</strong> at <strong>${price}¢</strong> — close to fair but worth monitoring.`;
+    } else {
+      body = `Models agree on ~<strong>${Math.round(avg)}°F</strong>. Market appears fairly priced at <strong>${price}¢</strong>. No strong edge detected right now.`;
     }
-  }
-
-  if (!targetBracket) return 10;
-
-  // Edge = how much the model probability differs from market price
-  // Models with tight consensus pointing at a <50¢ bracket = possible edge
-  const impliedProb = Math.round(consensus);
-  const marketProb = targetPrice;
-  const edgeRaw = Math.abs(impliedProb - marketProb);
-  return Math.min(99, Math.round(edgeRaw * 1.2 + (spread < 3 ? 15 : 0)));
-}
-
-function renderEdgeBox(city, markets, modelData, edge) {
-  const temps = MODEL_CONFIGS.map(m => modelData[m.id]).filter(v => v != null);
-  if (!temps.length) {
-    return `<div class="edge-box no-edge"><div class="edge-header"><div class="edge-title">Edge Analysis</div></div><div class="edge-rec">Waiting for model data...</div></div>`;
-  }
-
-  const modelAvg = temps.reduce((a,b)=>a+b,0)/temps.length;
-  const spread = Math.max(...temps) - Math.min(...temps);
-  const agreeCount = temps.filter(t => Math.abs(t - modelAvg) < 2).length;
-
-  let targetBracket = markets.find(m => bracketContains(m, modelAvg));
-  const targetPrice = targetBracket?.yes_price || 0;
-
-  const cls = edge > 55 ? 'strong-edge' : edge > 30 ? 'mild-edge' : 'no-edge';
-  const scoreCls = edge > 55 ? 'high' : edge > 30 ? 'mid' : 'low';
-
-  let rec = '';
-  if (edge > 55 && targetBracket) {
-    const side = targetPrice < 45 ? 'YES' : targetPrice > 55 ? 'NO' : null;
-    if (side === 'YES') rec = `Models (avg <strong>${Math.round(modelAvg)}°F</strong>) suggest <strong>${targetBracket.subtitle || targetBracket.ticker}</strong> is underpriced at <strong>${targetPrice}¢</strong>. Consider <strong style="color:var(--green)">YES</strong>.`;
-    else if (side === 'NO') rec = `Models suggest this bracket may be overpriced. Consider <strong style="color:var(--red)">NO</strong> on <strong>${targetBracket.subtitle || targetBracket.ticker}</strong> at ${targetPrice}¢.`;
-    else rec = `Models cluster around <strong>${Math.round(modelAvg)}°F</strong> — fairly priced. Monitor for updates.`;
-  } else if (edge > 30) {
-    rec = `Moderate signal. Models avg <strong>${Math.round(modelAvg)}°F</strong> with ${spread.toFixed(1)}° spread. Not a clear edge but worth watching.`;
   } else {
-    rec = `Market appears fairly priced relative to model consensus of <strong>${Math.round(modelAvg)}°F</strong>. No strong edge detected.`;
+    body = `Models average <strong>${Math.round(avg)}°F</strong> but couldn't match to a specific bracket. Check bracket labels manually.`;
   }
 
-  const tags = MODEL_CONFIGS.map(m => {
-    const v = modelData[m.id];
-    if (v == null) return `<span class="edge-tag neutral">${m.name}: —</span>`;
-    const diff = v - modelAvg;
-    const cls2 = diff > 1.5 ? 'no' : diff < -1.5 ? 'yes' : 'neutral';
-    return `<span class="edge-tag ${cls2}">${m.name} ${Math.round(v)}°</span>`;
+  const chips = MODELS.map(m => {
+    const v = wx?.[m.id];
+    if (v == null) return `<span class="chip neu">${m.name} —</span>`;
+    const d = v - avg;
+    const cls2 = d > 1.5 ? 'lo' : d < -1.5 ? 'hi' : 'neu';
+    return `<span class="chip ${cls2}">${m.name} ${Math.round(v)}°</span>`;
   }).join('');
 
-  return `<div class="edge-box ${cls}">
-    <div class="edge-header">
+  return `<div class="edge-card ${cls}">
+    <div class="edge-top">
       <div>
-        <div class="edge-title">Edge Score</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:2px;font-family:'Space Mono',monospace">${agreeCount}/${temps.length} models agree · ${spread.toFixed(1)}° spread</div>
+        <div class="edge-label">Edge Score</div>
+        <div style="font-size:11px;color:var(--text3);font-family:'IBM Plex Mono',monospace;margin-top:2px">${agreeCount}/${MODELS.length} models within 2° · ${spread?.toFixed(1) ?? '?'}° spread</div>
       </div>
-      <div class="edge-score ${scoreCls}">${edge}</div>
+      <div class="edge-num ${numCls}">${score}</div>
     </div>
-    <div class="edge-rec">${rec}</div>
-    <div class="edge-breakdown">${tags}</div>
+    <div class="edge-body">${body}</div>
+    <div class="edge-chips">${chips}</div>
   </div>`;
 }
 
-// ─── CITY SELECTION ──────────────────────────────────────────────────────────
+// ── CITY SELECT ────────────────────────────────────────────────────────────────
 async function selectCity(series) {
-  activeCityIdx = CITIES.findIndex(c => c.series === series);
-  if (activeCityIdx < 0) activeCityIdx = 0;
-  const city = CITIES[activeCityIdx];
-
-  // Update tabs
-  document.querySelectorAll('.city-tab').forEach(t => t.classList.remove('active'));
-  event?.target?.classList.add('active');
-
-  // Show loading state
-  renderLeft(city);
-
-  // Load data if needed
-  if (!cityMarkets[city.series]?.loaded) await loadCityMarket(city);
-  if (!cityWeather[city.series]) await loadWeatherModels(city);
-
-  renderLeft(city);
-  renderCityTabs(city.series);
+  activeSeries = series;
+  renderTabs();
+  renderLeft();
+  const city = CITIES.find(c => c.series === series);
+  if (!mktCache[series]?.loaded) { await fetchMarkets(city); }
+  if (!wxCache[series])          { await fetchWeather(city); }
+  renderLeft();
+  renderTabs();
 }
 
-// ─── AI CHAT ─────────────────────────────────────────────────────────────────
-function buildSystemPrompt() {
-  const city = CITIES[activeCityIdx];
-  const mkt = cityMarkets[city.series];
-  const wx = cityWeather[city.series];
+// ── AI CHAT ──────────────────────────────────────────────────────────────────
+function buildSystem() {
+  const city = CITIES.find(c => c.series === activeSeries);
+  const mk = mktCache[activeSeries];
+  const wx = wxCache[activeSeries];
+  const avg = modelAvg(activeSeries);
+  const spread = modelSpread(activeSeries);
+  const score = edgeScore(city);
 
-  const markets = mkt?.markets?.map(m => `${m.subtitle||m.ticker}: ${m.yes_price}¢ (vol: ${m.volume||0})`).join('\n') || 'No markets loaded';
-  const models = MODEL_CONFIGS.map(m => `${m.name}: ${wx?.[m.id] != null ? Math.round(wx[m.id])+'°F' : 'N/A'}`).join(', ');
-  const edge = computeEdge(city);
+  const bktLines = mk?.markets?.map(m => {
+    const p = getBracketPrice(m);
+    const label = m.subtitle || m.yes_sub_title || m.ticker;
+    const isTgt = avg != null && bracketMatchesTemp(m, avg);
+    return `  ${label}: ${p}¢${isTgt?' ← MODELS POINT HERE':''}`;
+  }).join('\n') || '  (no markets loaded)';
 
-  return `You are WeatherEdge AI, an expert at finding profitable edges in Kalshi daily temperature prediction markets.
+  const wxLines = MODELS.map(m => `  ${m.name}: ${wx?.[m.id] != null ? Math.round(wx[m.id])+'°F' : 'N/A'}`).join('\n');
 
-CURRENT CITY: ${city.name} (${city.short})
+  return `You are WeatherEdge AI, an expert in Kalshi daily high-temperature prediction markets.
 
-KALSHI MARKET BRACKETS (today's open markets):
-${markets}
+CURRENT CITY: ${city.name}
+TODAY'S DATE: ${new Date().toDateString()}
+EDGE SCORE: ${score}/100
 
-WEATHER MODEL FORECASTS (high temperature today):
-${models}
+KALSHI BRACKETS (open markets, yes_price in cents):
+${bktLines}
 
-EDGE SCORE: ${edge}/100
+WEATHER MODEL FORECASTS (today's projected high):
+${wxLines}
+MODEL AVERAGE: ${avg != null ? Math.round(avg)+'°F' : 'N/A'}
+MODEL SPREAD: ${spread != null ? spread.toFixed(1)+'°F' : 'N/A'}
 
-Your job:
-- Analyze discrepancies between weather models and market prices
-- Suggest which bracket(s) to bet on and which side (YES/NO)
-- Give a confidence rating (0-100)
-- Explain why models agree or disagree
-- Be concise, direct, and actionable — traders want specific guidance
-- Flag when models have wide spread (high uncertainty)
-- Note that Kalshi markets settle based on NWS Daily Climate Report, not forecasts
+IMPORTANT NOTES:
+- Kalshi temperature markets settle based on the NWS Daily Climate Report (official station reading), NOT weather forecasts
+- Prices shown are in cents (56¢ = 56% implied probability)
+- A YES costs the price, a NO costs (100 - price) cents
+- Edge exists when model consensus disagrees meaningfully with market pricing
 
-Keep answers under 150 words unless a detailed breakdown is requested.`;
+Your role: Give direct, actionable trading guidance. Be specific about which bracket, which side (YES/NO), and why. Include a confidence level. Keep responses under 160 words unless asked for detail.`;
 }
 
-async function sendChat(userMsg) {
-  const input = document.getElementById('chatInput');
-  const msg = userMsg || input.value.trim();
-  if (!msg || aiThinking) return;
-
-  input.value = '';
-  input.style.height = '38px';
-  aiThinking = true;
+async function sendChat(msg) {
+  const inp = document.getElementById('chatIn');
+  const text = msg || inp.value.trim();
+  if (!text || aiWorking) return;
+  inp.value = ''; inp.style.height = '38px';
+  aiWorking = true;
   document.getElementById('sendBtn').disabled = true;
 
-  appendMsg('user', msg);
-  chatHistory.push({ role: 'user', content: msg });
+  addMsg('user', text);
+  chatHist.push({ role:'user', content:text });
 
-  // Thinking indicator
-  const thinkId = appendMsg('ai', '<div class="typing-dots"><span></span><span></span><span></span></div>', true);
+  const thinkId = addMsg('ai', '<div class="dots"><span></span><span></span><span></span></div>', true);
 
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system: buildSystemPrompt(),
-        messages: chatHistory.slice(-8), // last 8 turns
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system: buildSystem(),
+        messages: chatHist.slice(-10)
       })
     });
-
     const data = await res.json();
-    const text = data.content?.[0]?.text || 'Sorry, I had trouble responding.';
-
+    const reply = data.content?.[0]?.text || 'Sorry, something went wrong.';
     document.getElementById(thinkId)?.remove();
-    appendMsg('ai', text);
-    chatHistory.push({ role: 'assistant', content: text });
-
+    addMsg('ai', reply);
+    chatHist.push({ role:'assistant', content:reply });
   } catch(e) {
     document.getElementById(thinkId)?.remove();
-    appendMsg('ai', `Error reaching AI: ${e.message}`);
+    addMsg('ai', `Error: ${e.message}`);
   }
-
-  aiThinking = false;
+  aiWorking = false;
   document.getElementById('sendBtn').disabled = false;
 }
 
-function quickAsk(msg) {
-  document.getElementById('chatInput').value = msg;
-  sendChat(msg);
-}
+function quickAsk(msg) { document.getElementById('chatIn').value = msg; sendChat(msg); }
 
-function appendMsg(role, content, isThinking = false) {
-  const id = 'msg-' + Date.now();
-  const div = document.createElement('div');
-  div.className = `msg ${role}${isThinking ? ' thinking' : ''}`;
-  div.id = id;
-
-  if (role === 'ai') {
-    div.innerHTML = `<div class="msg-label">WeatherEdge AI</div>${content.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}`;
-  } else {
-    div.textContent = content;
-  }
-
-  const container = document.getElementById('chatMessages');
-  container.appendChild(div);
-  container.scrollTop = container.scrollHeight;
+function addMsg(role, html, isTemp=false) {
+  const id = 'msg-'+Date.now()+Math.random();
+  const d = document.createElement('div');
+  d.className = `msg ${role}`; d.id = id;
+  if (role==='ai') d.innerHTML = `<div class="msg-from">WeatherEdge AI</div>${html.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}`;
+  else d.textContent = html;
+  const c = document.getElementById('chatMsgs');
+  c.appendChild(d); c.scrollTop = c.scrollHeight;
   return id;
 }
 
-// ─── STATUS ──────────────────────────────────────────────────────────────────
+// ── STATUS ────────────────────────────────────────────────────────────────────
 function setStatus(state, msg) {
-  const pill = document.getElementById('statusPill');
-  const text = document.getElementById('statusText');
-  pill.className = `status-pill ${state}`;
-  text.textContent = msg;
+  const chip = document.getElementById('statusChip');
+  const txt  = document.getElementById('statusTxt');
+  chip.className = `status-chip ${state}`;
+  txt.textContent = msg;
 }
 
-function showToast(msg) {
+function toast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+  setTimeout(()=>t.classList.remove('show'), 2500);
 }
 
-// ─── INIT ─────────────────────────────────────────────────────────────────────
+// ── INIT ──────────────────────────────────────────────────────────────────────
 async function init() {
-  setStatus('loading', 'Fetching markets...');
+  setStatus('loading', 'Loading...');
+  renderTabs();
 
-  // Build tabs with all cities first (greyed out)
-  const bar = document.getElementById('cityBar');
-  bar.innerHTML = CITIES.map((c, i) => `<div class="city-tab ${i===0?'active':''}" onclick="selectCity('${c.series}')">${c.short}</div>`).join('');
-
-  // Load first city fully
   const first = CITIES[0];
-  await loadCityMarket(first);
-  await loadWeatherModels(first);
-  renderLeft(first);
-  renderCityTabs(first.series);
+  await fetchMarkets(first);
+  await fetchWeather(first);
+  renderLeft();
+  renderTabs();
 
-  setStatus('live', 'Live · Kalshi + Open-Meteo');
+  const hasMarkets = mktCache[first.series]?.markets?.length > 0;
+  setStatus(hasMarkets ? 'live' : 'error', hasMarkets ? 'Live · Kalshi + Open-Meteo' : 'No markets open today');
 
-  // Background-load all other cities' markets (to show edge dots)
+  // Background-load rest for edge dots
   for (const city of CITIES.slice(1)) {
-    await loadCityMarket(city);
-    await loadWeatherModels(city);
+    await fetchMarkets(city);
+    await fetchWeather(city);
+    renderTabs(); // update dots as they come in
   }
-  renderCityTabs(first.series);
 }
 
 init();
