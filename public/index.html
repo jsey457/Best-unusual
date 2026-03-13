@@ -381,7 +381,7 @@ const CITIES = [
 const MODELS = [
   { id:'gfs',   name:'GFS',   color:'#1a56db', url:'https://api.open-meteo.com/v1/gfs',      hourly:false },
   { id:'ecmwf', name:'ECMWF', color:'#7c3aed', url:'https://api.open-meteo.com/v1/ecmwf',    hourly:true  }, // no daily support
-  { id:'nam',   name:'NAM',   color:'#0d7a3e', url:'https://api.open-meteo.com/v1/forecast',  hourly:false, extra:'&models=nam_conus' },
+  { id:'nam',   name:'HRRR',  color:'#0d7a3e', url:'https://api.open-meteo.com/v1/gfs',      hourly:false, extra:'&models=hrrr' },
   { id:'gem',   name:'GEM',   color:'#92400e', url:'https://api.open-meteo.com/v1/gem',       hourly:false },
   { id:'icon',  name:'ICON',  color:'#c81e1e', url:'https://api.open-meteo.com/v1/dwd-icon',  hourly:false },
 ];
@@ -458,32 +458,40 @@ async function fetchWeather(city) {
 
 // ── HELPERS ──────────────────────────────────────────────────────────────────
 function getBracketPrice(m) {
-  // yes_price = integer cents from /markets endpoint (confirmed from Kalshi quickstart docs)
-  // yes_bid / yes_ask = integer cents (from /events endpoint)
-  // yes_bid_dollars / yes_ask_dollars = decimal string "0.56"
-  if (m.yes_bid > 0 && m.yes_ask > 0) {
-    return Math.round((m.yes_bid + m.yes_ask) / 2); // midpoint
-  }
-  if (m.yes_price > 0) return m.yes_price;
-  if (m.yes_bid   > 0) return m.yes_bid;
-  if (m.last_price > 0) return m.last_price;
-  // fallback: dollar strings
+  // All price fields are dollar strings e.g. "0.0600" = 6¢
   const bid = parseFloat(m.yes_bid_dollars || '0');
-  const ask = parseFloat(m.yes_ask_dollars || m.last_price_dollars || '0');
+  const ask = parseFloat(m.yes_ask_dollars || '0');
   if (bid > 0 && ask > 0) return Math.round((bid + ask) / 2 * 100);
   if (bid > 0) return Math.round(bid * 100);
-  if (ask > 0) return Math.round(ask * 100);
+  const last = parseFloat(m.last_price_dollars || '0');
+  if (last > 0) return Math.round(last * 100);
+  // derive from NO side: yes = 1 - no_bid
+  const noBid = parseFloat(m.no_bid_dollars || '0');
+  if (noBid > 0) return Math.round((1 - noBid) * 100);
   return 0;
 }
 
 function bracketMatchesTemp(market, tempF) {
-  const s = (market.subtitle || market.yes_sub_title || market.title || '').toLowerCase();
-  // patterns: "72-73", "≥90", "< 50", "between 68 and 72", "at least 80"
-  const range = s.match(/(\d+)\s*[-–to]+\s*(\d+)/);
+  // Best field: floor_strike is the exact temperature threshold integer
+  if (market.floor_strike != null) {
+    // Check if this is the "above" bracket or a range bracket
+    const s = (market.no_sub_title || market.yes_sub_title || market.subtitle || '').toLowerCase();
+    const isAbove = /above|or above|at least|≥|>=/.test(s);
+    const isBelow = /below|under|at most|≤|<=/.test(s);
+    if (isAbove) return tempF >= market.floor_strike;
+    if (isBelow) return tempF < market.floor_strike;
+    // range bracket: floor_strike is the lower bound, next bracket's floor_strike is upper
+    // check if temp rounds to this strike
+    return Math.round(tempF) === market.floor_strike || 
+           (tempF >= market.floor_strike && tempF < market.floor_strike + 2);
+  }
+  // Fallback: parse text label
+  const s = (market.no_sub_title || market.yes_sub_title || market.subtitle || market.title || '').toLowerCase();
+  const range = s.match(/(\d+)\s*[-–]\s*(\d+)/);
   if (range) { const lo=+range[1], hi=+range[2]; return tempF>=lo && tempF<=hi; }
-  const ge = s.match(/(?:at least|≥|>=|>)\s*(\d+)/);
+  const ge = s.match(/(?:at least|or above|≥|>=)\s*(\d+)/);
   if (ge) return tempF >= +ge[1];
-  const le = s.match(/(?:at most|below|≤|<=|<)\s*(\d+)/);
+  const le = s.match(/(?:below|under|≤|<=)\s*(\d+)/);
   if (le) return tempF < +le[1];
   return false;
 }
@@ -575,7 +583,7 @@ function renderLeft() {
 
 function renderBracket(m, modelAvgTemp) {
   const price   = getBracketPrice(m);
-  const label   = m.subtitle || m.yes_sub_title || m.title?.replace(/will.*?be/i,'').trim() || m.ticker;
+  const label   = m.no_sub_title || m.yes_sub_title || m.subtitle || m.ticker;
   const width   = Math.max(2, price);
   const isPeak  = modelAvgTemp != null && bracketMatchesTemp(m, modelAvgTemp);
   const isTop   = price >= 40;
@@ -656,11 +664,11 @@ function renderEdge(city, markets, wx, score) {
   let body = '';
   if (target && price != null) {
     if (score > 55 && price < 40) {
-      body = `Models average <strong>${Math.round(avg)}°F</strong> — pointing to <strong>${target.subtitle||target.ticker}</strong>, currently priced at just <strong>${price}¢</strong>. Models suggest this is underpriced. Consider <strong style="color:var(--green)">YES</strong>.`;
+      body = `Models average <strong>${Math.round(avg)}°F</strong> — pointing to <strong>${target.no_sub_title||target.yes_sub_title||target.ticker}</strong>, currently priced at just <strong>${price}¢</strong>. Models suggest this is underpriced. Consider <strong style="color:var(--green)">YES</strong>.`;
     } else if (score > 55 && price > 60) {
-      body = `Models average <strong>${Math.round(avg)}°F</strong> but this bracket is priced at <strong>${price}¢</strong>. Possible overpricing. Consider <strong style="color:var(--red)">NO</strong> on <strong>${target.subtitle||target.ticker}</strong>.`;
+      body = `Models average <strong>${Math.round(avg)}°F</strong> but this bracket is priced at <strong>${price}¢</strong>. Possible overpricing. Consider <strong style="color:var(--red)">NO</strong> on <strong>${target.no_sub_title||target.yes_sub_title||target.ticker}</strong>.`;
     } else if (score > 30) {
-      body = `Mild signal. Models cluster around <strong>${Math.round(avg)}°F</strong> (${spread?.toFixed(1)}° spread). Target bracket <strong>${target.subtitle||target.ticker}</strong> at <strong>${price}¢</strong> — close to fair but worth monitoring.`;
+      body = `Mild signal. Models cluster around <strong>${Math.round(avg)}°F</strong> (${spread?.toFixed(1)}° spread). Target bracket <strong>${target.no_sub_title||target.yes_sub_title||target.ticker}</strong> at <strong>${price}¢</strong> — close to fair but worth monitoring.`;
     } else {
       body = `Models agree on ~<strong>${Math.round(avg)}°F</strong>. Market appears fairly priced at <strong>${price}¢</strong>. No strong edge detected right now.`;
     }
@@ -712,7 +720,7 @@ function buildSystem() {
 
   const bktLines = mk?.markets?.map(m => {
     const p = getBracketPrice(m);
-    const label = m.subtitle || m.yes_sub_title || m.ticker;
+    const label = m.no_sub_title || m.yes_sub_title || m.ticker;
     const isTgt = avg != null && bracketMatchesTemp(m, avg);
     return `  ${label}: ${p}¢${isTgt?' ← MODELS POINT HERE':''}`;
   }).join('\n') || '  (no markets loaded)';
