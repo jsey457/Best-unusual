@@ -93,11 +93,84 @@ header {
 .city-tab.active { color: var(--accent); border-bottom-color: var(--accent); background: var(--accent-light); }
 .edge-pip { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 5px rgba(13,122,62,.4); }
 
-/* LAYOUT */
-.main { display: grid; grid-template-columns: 1fr 340px; min-height: calc(100vh - 102px); }
+/* LAYOUT - full width now, no right panel */
+.main { padding: 0; }
 
-/* LEFT */
-.left { padding: 22px 24px; overflow-y: auto; border-right: 1px solid var(--border); }
+/* VIEW TABS */
+.view-tabs {
+  background: var(--bg2); border-bottom: 2px solid var(--border);
+  padding: 0 24px; display: flex; gap: 0;
+}
+.view-tab {
+  font-family: 'Archivo Narrow', sans-serif; font-weight: 700;
+  font-size: 12px; letter-spacing: .06em; text-transform: uppercase;
+  padding: 11px 18px; cursor: pointer; color: var(--text3);
+  border-bottom: 2px solid transparent; margin-bottom: -2px;
+  transition: all .15s;
+}
+.view-tab:hover { color: var(--text2); }
+.view-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* TODAY PANEL */
+.today-panel { max-width: 960px; margin: 0 auto; padding: 22px 24px; }
+
+/* HISTORICS PANEL */
+.hist-panel { max-width: 960px; margin: 0 auto; padding: 22px 24px; }
+.hist-loading { display:flex; align-items:center; justify-content:center; height:200px; color:var(--text3); font-family:'IBM Plex Mono',monospace; font-size:12px; gap:8px; }
+
+/* MAE TABLE */
+.mae-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 22px; }
+.mae-table { width: 100%; border-collapse: collapse; }
+.mae-table th {
+  font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--text3);
+  padding: 10px 14px; background: var(--bg3); border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+.mae-table th.num { text-align: right; }
+.mae-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 13px; }
+.mae-table tr:last-child td { border-bottom: none; }
+.mae-table tr:hover td { background: var(--bg3); }
+.mae-rank { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; }
+.mae-rank.r1 { background: #fef3c7; color: #92400e; }
+.mae-rank.r2 { background: var(--bg3); color: var(--text3); }
+.mae-val { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; text-align: right; }
+.mae-bar-wrap { display: flex; align-items: center; gap: 8px; }
+.mae-bar { height: 6px; border-radius: 3px; min-width: 2px; transition: width .4s ease; }
+.mae-best { color: var(--green); font-weight: 700; }
+.mae-worst { color: var(--red); }
+
+/* BIAS CHART */
+.bias-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 22px; }
+.bias-title { font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 14px; }
+.bias-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.bias-name { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 700; width: 44px; flex-shrink: 0; }
+.bias-track { flex: 1; position: relative; height: 8px; background: var(--bg3); border-radius: 4px; }
+.bias-center { position: absolute; left: 50%; top: -2px; width: 1px; height: 12px; background: var(--border2); }
+.bias-fill { position: absolute; top: 0; height: 8px; border-radius: 4px; }
+.bias-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; width: 48px; text-align: right; flex-shrink: 0; }
+
+/* DAILY TABLE */
+.daily-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 22px; }
+.daily-scroll { overflow-x: auto; }
+.daily-table { width: 100%; border-collapse: collapse; min-width: 600px; }
+.daily-table th {
+  font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--text3);
+  padding: 9px 12px; background: var(--bg3); border-bottom: 1px solid var(--border);
+  text-align: right; white-space: nowrap;
+}
+.daily-table th:first-child { text-align: left; }
+.daily-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; font-size: 11px; text-align: right; }
+.daily-table td:first-child { text-align: left; color: var(--text2); }
+.daily-table tr:last-child td { border-bottom: none; }
+.daily-table tr:hover td { background: var(--bg3); }
+.err-pos { color: var(--red); }
+.err-neg { color: var(--accent); }
+.err-zero { color: var(--green); font-weight: 700; }
+.actual-col { font-weight: 700; color: var(--text); }
+
+
 
 .section-head {
   font-family: 'IBM Plex Mono', monospace;
@@ -210,70 +283,11 @@ header {
 .chip.lo  { background: var(--red-bg);   color: var(--red); }
 .chip.neu { background: var(--bg3);      color: var(--text3); }
 
-/* RIGHT / CHAT */
-.right {
-  display: flex; flex-direction: column;
-  height: calc(100vh - 102px);
-  position: sticky; top: 102px;
-  background: var(--bg2);
-}
-.chat-top {
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; gap: 10px;
-}
-.chat-icon {
-  width: 32px; height: 32px;
-  background: linear-gradient(135deg, #7c3aed, #4f46e5);
-  border-radius: 8px; color: white;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 15px; flex-shrink: 0;
-}
-.chat-ttl { font-weight: 800; font-size: 14px; letter-spacing:-.01em; }
-.chat-sub { font-size: 11px; color: var(--text3); }
-
-.chat-msgs {
-  flex: 1; overflow-y: auto; padding: 14px;
-  display: flex; flex-direction: column; gap: 10px;
-  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
-}
-.msg { max-width: 92%; font-size: 13px; line-height: 1.6; border-radius: 10px; padding: 10px 13px; animation: msgIn .2s ease; }
-@keyframes msgIn { from{opacity:0;transform:translateY(3px)} to{opacity:1;transform:translateY(0)} }
-.msg.user { align-self: flex-end; background: var(--accent); color: white; }
-.msg.ai   { align-self: flex-start; background: var(--bg3); border: 1px solid var(--border); color: var(--text); }
-.msg-from { font-family:'IBM Plex Mono',monospace; font-size:9px; font-weight:600; color:#7c3aed; letter-spacing:.1em; text-transform:uppercase; margin-bottom:4px; }
+/* ERROR BANNER */
 .dots { display:inline-flex; gap:3px; align-items:center; }
 .dots span { width:5px; height:5px; border-radius:50%; background:var(--text3); animation: dot 1.2s ease-in-out infinite; }
 .dots span:nth-child(2){animation-delay:.2s} .dots span:nth-child(3){animation-delay:.4s}
 @keyframes dot{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
-
-.quick-row { padding: 8px 12px; display:flex; flex-wrap:wrap; gap:5px; border-top:1px solid var(--border); }
-.qbtn {
-  font-size:11px; padding:5px 10px; border-radius:6px;
-  border:1px solid var(--border); background:var(--bg2); color:var(--text2);
-  cursor:pointer; transition:all .12s; font-family:'Archivo',sans-serif;
-}
-.qbtn:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-light); }
-
-.chat-foot { padding:10px 12px; border-top:1px solid var(--border); display:flex; gap:8px; }
-.chat-in {
-  flex:1; background:var(--bg3); border:1px solid var(--border);
-  border-radius:8px; padding:8px 12px; color:var(--text);
-  font-family:'Archivo',sans-serif; font-size:13px; outline:none;
-  resize:none; height:38px; min-height:38px; max-height:90px; transition:border-color .15s;
-}
-.chat-in:focus { border-color:var(--accent); background:white; }
-.chat-in::placeholder { color:var(--text3); }
-.send {
-  width:38px; height:38px; background:var(--accent); border:none;
-  border-radius:8px; color:white; font-size:16px; cursor:pointer;
-  display:flex; align-items:center; justify-content:center; flex-shrink:0;
-  transition:all .12s;
-}
-.send:hover { background:#1447c0; }
-.send:disabled { opacity:.4; cursor:not-allowed; }
-
-/* ERROR BANNER */
 .err-banner {
   background: var(--red-bg); border: 1px solid #fca5a5; border-radius: 9px;
   padding: 10px 14px; margin-bottom: 16px; font-size: 12px; color: var(--red);
@@ -299,14 +313,12 @@ canvas.temp-chart { width:100%; height:200px; display:block; }
 ::-webkit-scrollbar{width:5px;height:5px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
 
 @media(max-width:900px){
-  .main{grid-template-columns:1fr}
-  .right{height:480px;position:static;border-top:1px solid var(--border)}
   .models-row{grid-template-columns:repeat(3,1fr)}
 }
 @media(max-width:520px){
   .models-row{grid-template-columns:repeat(2,1fr)}
   header{padding:0 14px} .city-bar{padding:0 10px}
-  .left{padding:14px}
+  .today-panel,.hist-panel{padding:14px}
 }
 </style>
 </head>
@@ -327,38 +339,25 @@ canvas.temp-chart { width:100%; height:200px; display:block; }
   <!-- injected -->
 </div>
 
+<div class="view-tabs">
+  <div class="view-tab active" id="tab-today" onclick="switchView('today')">Today's Markets</div>
+  <div class="view-tab" id="tab-hist"  onclick="switchView('hist')">Model Accuracy (30d)</div>
+</div>
+
 <div class="main">
-  <div class="left" id="leftPanel">
-    <div style="display:flex;align-items:center;justify-content:center;height:300px;color:var(--text3);font-family:'IBM Plex Mono',monospace;font-size:12px;gap:8px">
-      <div class="dots"><span></span><span></span><span></span></div> Fetching markets...
+  <div id="view-today">
+    <div class="today-panel" id="leftPanel">
+      <div style="display:flex;align-items:center;justify-content:center;height:300px;color:var(--text3);font-family:'IBM Plex Mono',monospace;font-size:12px;gap:8px">
+        <div class="dots"><span></span><span></span><span></span></div> Fetching markets...
+      </div>
     </div>
   </div>
 
-  <div class="right">
-    <div class="chat-top">
-      <div class="chat-icon">✦</div>
-      <div>
-        <div class="chat-ttl">AI Analyst</div>
-        <div class="chat-sub">Powered by Claude · Market + Model data loaded</div>
+  <div id="view-hist" style="display:none">
+    <div class="hist-panel" id="histPanel">
+      <div class="hist-loading">
+        <div class="dots"><span></span><span></span><span></span></div> Click to load historical accuracy...
       </div>
-    </div>
-    <div class="chat-msgs" id="chatMsgs">
-      <div class="msg ai">
-        <div class="msg-from">WeatherEdge AI</div>
-        Hi! I have the Kalshi temperature market brackets and all 5 weather model forecasts loaded for whatever city you're viewing. Ask me where the edge is, which bracket to bet, or anything else.
-      </div>
-    </div>
-    <div class="quick-row">
-      <button class="qbtn" onclick="quickAsk('Where is the best edge right now?')">Best edge?</button>
-      <button class="qbtn" onclick="quickAsk('Which models agree and which disagree for this city?')">Model agreement?</button>
-      <button class="qbtn" onclick="quickAsk('Which bracket should I bet on and which side?')">Best bracket?</button>
-      <button class="qbtn" onclick="quickAsk('How confident are you in this edge?')">Confidence?</button>
-    </div>
-    <div class="chat-foot">
-      <textarea class="chat-in" id="chatIn" placeholder="Ask about edge, models, brackets..."
-        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"
-        oninput="this.style.height='38px';this.style.height=Math.min(this.scrollHeight,90)+'px'"></textarea>
-      <button class="send" id="sendBtn" onclick="sendChat()">↑</button>
     </div>
   </div>
 </div>
@@ -399,12 +398,12 @@ const nwsGridCache = {};
 // Hourly data cache: series → { hours:[], modelLines:{gfs:[],ecmwf[],...}, observed:[] }
 let hourlyCache = {};
 
-// ── STATE ────────────────────────────────────────────────────────────────────
 let activeSeries = CITIES[0].series;
-let mktCache = {};   // series → { markets:[], loaded:bool, error? }
-let wxCache  = {};   // series → { gfs:xx, ecmwf:xx, ... }
-let chatHist = [];
-let aiWorking = false;
+let mktCache  = {};
+let wxCache   = {};
+let hourlyCache = {};
+let activeView = 'today';
+let histLoaded = false;
 
 // ── KALSHI FETCH ─────────────────────────────────────────────────────────────
 async function kalshi(path, params = {}) {
@@ -682,7 +681,6 @@ function renderLeft() {
   const mk = mktCache[city.series];
   const wx = wxCache[city.series];
   const panel = document.getElementById('leftPanel');
-
   if (!mk?.loaded) {
     panel.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:300px;color:var(--text3);font-family:'IBM Plex Mono',monospace;font-size:12px;gap:8px"><div class="dots"><span></span><span></span><span></span></div> Loading ${city.name}...</div>`;
     return;
@@ -983,97 +981,254 @@ async function selectCity(series) {
   renderLeft();
   renderTabs();
   drawChart(series);
-}
-
-// ── AI CHAT ──────────────────────────────────────────────────────────────────
-function buildSystem() {
-  const city = CITIES.find(c => c.series === activeSeries);
-  const mk = mktCache[activeSeries];
-  const wx = wxCache[activeSeries];
-  const avg = modelAvg(activeSeries);
-  const spread = modelSpread(activeSeries);
-  const score = edgeScore(city);
-
-  const bktLines = mk?.markets?.map(m => {
-    const p = getBracketPrice(m);
-    const label = m.no_sub_title || m.yes_sub_title || m.ticker;
-    const isTgt = avg != null && bracketMatchesTemp(m, avg);
-    return `  ${label}: ${p}¢${isTgt?' ← MODELS POINT HERE':''}`;
-  }).join('\n') || '  (no markets loaded)';
-
-  const wxLines = MODELS.map(m => `  ${m.name}: ${wx?.[m.id] != null ? Math.round(wx[m.id])+'°F' : 'N/A'}`).join('\n');
-
-  return `You are WeatherEdge AI, an expert in Kalshi daily high-temperature prediction markets.
-
-CURRENT CITY: ${city.name}
-TODAY'S DATE: ${new Date().toDateString()}
-EDGE SCORE: ${score}/100
-
-KALSHI BRACKETS (open markets, yes_price in cents):
-${bktLines}
-
-WEATHER MODEL FORECASTS (today's projected high):
-${wxLines}
-MODEL AVERAGE: ${avg != null ? Math.round(avg)+'°F' : 'N/A'}
-MODEL SPREAD: ${spread != null ? spread.toFixed(1)+'°F' : 'N/A'}
-
-IMPORTANT NOTES:
-- Kalshi temperature markets settle based on the NWS Daily Climate Report (official station reading), NOT weather forecasts
-- Prices shown are in cents (56¢ = 56% implied probability)
-- A YES costs the price, a NO costs (100 - price) cents
-- Edge exists when model consensus disagrees meaningfully with market pricing
-
-Your role: Give direct, actionable trading guidance. Be specific about which bracket, which side (YES/NO), and why. Include a confidence level. Keep responses under 160 words unless asked for detail.`;
-}
-
-async function sendChat(msg) {
-  const inp = document.getElementById('chatIn');
-  const text = msg || inp.value.trim();
-  if (!text || aiWorking) return;
-  inp.value = ''; inp.style.height = '38px';
-  aiWorking = true;
-  document.getElementById('sendBtn').disabled = true;
-
-  addMsg('user', text);
-  chatHist.push({ role:'user', content:text });
-
-  const thinkId = addMsg('ai', '<div class="dots"><span></span><span></span><span></span></div>', true);
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        system: buildSystem(),
-        messages: chatHist.slice(-10)
-      })
-    });
-    const data = await res.json();
-    const reply = data.content?.[0]?.text || 'Sorry, something went wrong.';
-    document.getElementById(thinkId)?.remove();
-    addMsg('ai', reply);
-    chatHist.push({ role:'assistant', content:reply });
-  } catch(e) {
-    document.getElementById(thinkId)?.remove();
-    addMsg('ai', `Error: ${e.message}`);
+  // If historics tab is open, reload for new city
+  if (activeView === 'hist') {
+    histLoaded = false;
+    histLoaded = true;
+    loadHistorics();
   }
-  aiWorking = false;
-  document.getElementById('sendBtn').disabled = false;
 }
 
-function quickAsk(msg) { document.getElementById('chatIn').value = msg; sendChat(msg); }
+// ── VIEW SWITCHING ────────────────────────────────────────────────────────────
+function switchView(view) {
+  activeView = view;
+  document.getElementById('view-today').style.display = view === 'today' ? '' : 'none';
+  document.getElementById('view-hist').style.display  = view === 'hist'  ? '' : 'none';
+  document.getElementById('tab-today').classList.toggle('active', view === 'today');
+  document.getElementById('tab-hist').classList.toggle('active',  view === 'hist');
+  if (view === 'hist' && !histLoaded) {
+    histLoaded = true;
+    loadHistorics();
+  }
+}
 
-function addMsg(role, html, isTemp=false) {
-  const id = 'msg-'+Date.now()+Math.random();
-  const d = document.createElement('div');
-  d.className = `msg ${role}`; d.id = id;
-  if (role==='ai') d.innerHTML = `<div class="msg-from">WeatherEdge AI</div>${html.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}`;
-  else d.textContent = html;
-  const c = document.getElementById('chatMsgs');
-  c.appendChild(d); c.scrollTop = c.scrollHeight;
-  return id;
+// ── HISTORICS ─────────────────────────────────────────────────────────────────
+// Uses Open-Meteo Previous Runs API (historical-forecast-api.open-meteo.com)
+// which archives actual past model runs — so each day's value IS what the
+// model predicted on that day (day-0 run), not a reanalysis.
+// Compared against NWS station observed daily highs.
+
+const HIST_DAYS = 30;
+let histCache = {}; // series → { dates[], observed[], modelData:{gfs:[], ...}, computed:bool }
+
+async function fetchHistoricForCity(city) {
+  if (histCache[city.series]?.computed) return;
+
+  const end   = new Date(); end.setDate(end.getDate() - 1); // yesterday (today not settled yet)
+  const start = new Date(end); start.setDate(start.getDate() - (HIST_DAYS - 1));
+  const fmt   = d => d.toISOString().split('T')[0];
+  const startStr = fmt(start), endStr = fmt(end);
+
+  const result = { dates: [], observed: [], modelData: {}, computed: false };
+
+  // Build date array
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate()+1)) {
+    result.dates.push(fmt(new Date(d)));
+  }
+
+  // Fetch NWS observed daily highs from station observations
+  try {
+    const r = await fetch(
+      `https://api.weather.gov/stations/${city.station}/observations?start=${startStr}T00:00:00Z&end=${endStr}T23:59:59Z&limit=500`,
+      { headers: { 'User-Agent': 'WeatherEdge/1.0' } }
+    );
+    if (r.ok) {
+      const d = await r.json();
+      // Group by date, find daily max
+      const byDate = {};
+      for (const f of (d.features || [])) {
+        const t = f.properties?.temperature?.value;
+        const ts = f.properties?.timestamp;
+        if (t == null || !ts) continue;
+        const date = ts.split('T')[0];
+        const tF = Math.round(t * 9/5 + 32);
+        if (!byDate[date] || tF > byDate[date]) byDate[date] = tF;
+      }
+      result.observed = result.dates.map(d => byDate[d] ?? null);
+    }
+  } catch(e) { console.warn('Hist NWS obs failed:', e.message); }
+
+  // Fetch historical model data from Previous Runs API
+  // Each model at day_offset=0 = what the model predicted on that exact day
+  const histModels = [
+    { id:'gfs',   name:'GFS',   url:`https://historical-forecast-api.open-meteo.com/v1/forecast?models=gfs_global`   },
+    { id:'ecmwf', name:'ECMWF', url:`https://historical-forecast-api.open-meteo.com/v1/forecast?models=ecmwf_ifs025` },
+    { id:'nws',   name:'NWS',   url:`https://historical-forecast-api.open-meteo.com/v1/forecast?models=gfs_global`   }, // NWS uses GFS as proxy for hist
+    { id:'gem',   name:'GEM',   url:`https://historical-forecast-api.open-meteo.com/v1/forecast?models=gem_global`   },
+    { id:'icon',  name:'ICON',  url:`https://historical-forecast-api.open-meteo.com/v1/forecast?models=icon_global`  },
+  ];
+
+  await Promise.all(histModels.map(async m => {
+    try {
+      const url = `${m.url}&latitude=${city.lat}&longitude=${city.lon}&daily=temperature_2m_max&temperature_unit=fahrenheit&start_date=${startStr}&end_date=${endStr}&timezone=auto`;
+      const r = await fetch(url);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const d = await r.json();
+      if (d.error) throw new Error(d.reason);
+      const times = d.daily?.time || [];
+      const vals  = d.daily?.temperature_2m_max || [];
+      // Map to our date array
+      result.modelData[m.id] = result.dates.map(date => {
+        const i = times.indexOf(date);
+        return i >= 0 && vals[i] != null ? Math.round(vals[i] * 10) / 10 : null;
+      });
+    } catch(e) {
+      console.warn(`Hist ${m.name} failed:`, e.message);
+      result.modelData[m.id] = result.dates.map(() => null);
+    }
+  }));
+
+  result.computed = true;
+  histCache[city.series] = result;
+}
+
+function computeMAE(predicted, actual) {
+  const pairs = predicted.map((p, i) => ({ p, a: actual[i] }))
+    .filter(x => x.p != null && x.a != null);
+  if (!pairs.length) return null;
+  const mae = pairs.reduce((sum, x) => sum + Math.abs(x.p - x.a), 0) / pairs.length;
+  const bias = pairs.reduce((sum, x) => sum + (x.p - x.a), 0) / pairs.length;
+  return { mae: Math.round(mae * 10) / 10, bias: Math.round(bias * 10) / 10, n: pairs.length };
+}
+
+async function loadHistorics() {
+  const panel = document.getElementById('histPanel');
+  const city  = CITIES.find(c => c.series === activeSeries);
+
+  panel.innerHTML = `<div class="hist-loading"><div class="dots"><span></span><span></span><span></span></div> Loading ${HIST_DAYS} days of data for ${city.name}...</div>`;
+
+  await fetchHistoricForCity(city);
+  renderHistorics(city);
+}
+
+function renderHistorics(city) {
+  const panel = document.getElementById('histPanel');
+  const hd = histCache[city.series];
+  if (!hd?.computed) {
+    panel.innerHTML = `<div class="hist-loading">No historical data available.</div>`;
+    return;
+  }
+
+  const MODEL_META = [
+    { id:'gfs',   name:'GFS',   color:'#1a56db' },
+    { id:'ecmwf', name:'ECMWF', color:'#7c3aed' },
+    { id:'nws',   name:'NWS',   color:'#0d7a3e' },
+    { id:'gem',   name:'GEM',   color:'#92400e' },
+    { id:'icon',  name:'ICON',  color:'#c81e1e' },
+  ];
+
+  // Compute MAE + bias per model
+  const stats = MODEL_META.map(m => ({
+    ...m,
+    ...computeMAE(hd.modelData[m.id] || [], hd.observed),
+  })).filter(s => s.mae != null);
+
+  stats.sort((a, b) => a.mae - b.mae);
+  const maxMAE = Math.max(...stats.map(s => s.mae));
+  const maxBias = Math.max(...stats.map(s => Math.abs(s.bias || 0)));
+
+  // MAE summary table
+  const maeRows = stats.map((s, i) => {
+    const rankCls = i === 0 ? 'r1' : 'r2';
+    const rankLbl = i === 0 ? '🥇 BEST' : `#${i+1}`;
+    const barW = Math.round((s.mae / maxMAE) * 120);
+    const maeCls = i === 0 ? 'mae-best' : i === stats.length-1 ? 'mae-worst' : '';
+    return `<tr>
+      <td><span class="mae-rank ${rankCls}">${rankLbl}</span></td>
+      <td style="font-weight:700;color:${s.color}">${s.name}</td>
+      <td><div class="mae-bar-wrap">
+        <div class="mae-bar" style="width:${barW}px;background:${s.color};opacity:.7"></div>
+        <span class="mae-val ${maeCls}">${s.mae}°</span>
+      </div></td>
+      <td class="mae-val" style="color:${s.bias > 0 ? 'var(--red)' : s.bias < 0 ? 'var(--accent)' : 'var(--green)'}">${s.bias > 0 ? '+' : ''}${s.bias}°</td>
+      <td class="mae-val" style="color:var(--text3)">${s.n}d</td>
+    </tr>`;
+  }).join('');
+
+  // Bias visualization
+  const biasRows = stats.map(s => {
+    const pct = maxBias > 0 ? Math.abs(s.bias) / maxBias * 45 : 0;
+    const isPos = s.bias >= 0;
+    const fillStyle = isPos
+      ? `left:50%;width:${pct}%;background:${s.color};opacity:.7`
+      : `left:${50-pct}%;width:${pct}%;background:${s.color};opacity:.7`;
+    const biasLbl = s.bias > 0 ? `Runs +${s.bias}° warm` : s.bias < 0 ? `Runs ${s.bias}° cold` : 'No bias';
+    return `<div class="bias-row">
+      <div class="bias-name" style="color:${s.color}">${s.name}</div>
+      <div class="bias-track">
+        <div class="bias-center"></div>
+        <div class="bias-fill" style="${fillStyle}"></div>
+      </div>
+      <div class="bias-label" style="color:${s.color}">${biasLbl}</div>
+    </div>`;
+  }).join('');
+
+  // Daily detail table — last 14 days
+  const recentDates = hd.dates.slice(-14);
+  const recentObs   = hd.observed.slice(-14);
+  const dateHdrs = recentDates.map(d => {
+    const dt = new Date(d + 'T12:00:00');
+    return `<th>${dt.toLocaleDateString('en-US',{month:'short',day:'numeric'})}</th>`;
+  }).join('');
+
+  const modelRows = MODEL_META.map(m => {
+    const recent = (hd.modelData[m.id] || []).slice(-14);
+    const cells = recent.map((v, i) => {
+      const obs = recentObs[i];
+      if (v == null) return `<td style="color:var(--text3)">—</td>`;
+      const err = obs != null ? v - obs : null;
+      const errCls = err == null ? '' : Math.abs(err) < 1 ? 'err-zero' : err > 0 ? 'err-pos' : 'err-neg';
+      const errStr = err != null ? ` <span class="${errCls}" style="font-size:9px">(${err>0?'+':''}${Math.round(err)})</span>` : '';
+      return `<td>${Math.round(v)}°${errStr}</td>`;
+    }).join('');
+    return `<tr><td style="color:${m.color};font-weight:700">${m.name}</td>${cells}</tr>`;
+  }).join('');
+
+  const obsRow = recentObs.map(v =>
+    v != null ? `<td class="actual-col">${v}°</td>` : `<td style="color:var(--text3)">—</td>`
+  ).join('');
+
+  panel.innerHTML = `
+    <div class="mkt-top">
+      <div>
+        <div class="mkt-city">Model Accuracy · ${city.name}</div>
+        <div class="mkt-sub">Past ${HIST_DAYS} days · forecast vs NWS observed daily high · errors in (parentheses)</div>
+      </div>
+      <div class="mkt-date">${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</div>
+    </div>
+
+    <div class="section-head">Mean Absolute Error — Lower is better</div>
+    <div class="mae-wrap">
+      <table class="mae-table">
+        <thead><tr>
+          <th>Rank</th><th>Model</th>
+          <th>MAE (avg miss)</th>
+          <th class="num">Bias</th>
+          <th class="num">Days</th>
+        </tr></thead>
+        <tbody>${maeRows}</tbody>
+      </table>
+    </div>
+
+    <div class="section-head">Warm/Cold Bias — Does each model run systematically warm or cold?</div>
+    <div class="bias-wrap">
+      <div class="bias-title">
+        Positive = model runs warmer than actual &nbsp;·&nbsp; Negative = model runs colder than actual
+      </div>
+      ${biasRows}
+    </div>
+
+    <div class="section-head">Daily Detail — Last 14 days (error vs actual in parentheses)</div>
+    <div class="daily-wrap"><div class="daily-scroll">
+      <table class="daily-table">
+        <thead><tr><th>Model</th>${dateHdrs}</tr></thead>
+        <tbody>
+          ${modelRows}
+          <tr style="background:var(--bg3)"><td style="font-weight:700">Actual</td>${obsRow}</tr>
+        </tbody>
+      </table>
+    </div></div>
+  `;
 }
 
 // ── STATUS ────────────────────────────────────────────────────────────────────
