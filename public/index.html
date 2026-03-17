@@ -283,6 +283,19 @@ header {
 .toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--text); color:white; font-family:'IBM Plex Mono',monospace; font-size:11px; padding:8px 16px; border-radius:8px; opacity:0; transition:opacity .2s; pointer-events:none; z-index:999; white-space:nowrap; }
 .toast.show { opacity:1; }
 
+/* CHART */
+.chart-wrap {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px 16px; margin-bottom: 22px;
+}
+.chart-header { display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px; }
+.chart-title { font-size:12px; font-weight:600; color:var(--text2); }
+.chart-legend { display:flex; flex-wrap:wrap; gap:10px; }
+.chart-legend-item { display:flex; align-items:center; gap:5px; font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:600; color:var(--text2); }
+.chart-legend-line { width:18px; height:2px; border-radius:1px; }
+.chart-legend-line.dashed { background: repeating-linear-gradient(90deg, currentColor 0, currentColor 4px, transparent 4px, transparent 8px); height:0; border-top: 2px dashed; }
+canvas.temp-chart { width:100%; height:200px; display:block; }
+
 ::-webkit-scrollbar{width:5px;height:5px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
 
 @media(max-width:900px){
@@ -355,36 +368,36 @@ header {
 <script>
 // ── CITY CONFIG ─────────────────────────────────────────────────────────────
 const CITIES = [
-  { series:'KXHIGHNY',  name:'New York',      short:'NYC', lat:40.7789,  lon:-73.9692  },
-  { series:'KXHIGHCHI', name:'Chicago',        short:'CHI', lat:41.8827,  lon:-87.6233  },
-  { series:'KXHIGHMIA', name:'Miami',          short:'MIA', lat:25.7617,  lon:-80.1918  },
-  { series:'KXHIGHLAX', name:'Los Angeles',    short:'LAX', lat:34.0522,  lon:-118.2437 },
-  { series:'KXHIGHAUS', name:'Austin',         short:'AUS', lat:30.2672,  lon:-97.7431  },
-  { series:'KXHIGHBOS', name:'Boston',         short:'BOS', lat:42.3601,  lon:-71.0589  },
-  { series:'KXHIGHDEN', name:'Denver',         short:'DEN', lat:39.7392,  lon:-104.9903 },
-  { series:'KXHIGHHOU', name:'Houston',        short:'HOU', lat:29.7604,  lon:-95.3698  },
-  { series:'KXHIGHPHX', name:'Phoenix',        short:'PHX', lat:33.4484,  lon:-112.0740 },
-  { series:'KXHIGHSEA', name:'Seattle',        short:'SEA', lat:47.6062,  lon:-122.3321 },
-  { series:'KXHIGHATL', name:'Atlanta',        short:'ATL', lat:33.7490,  lon:-84.3880  },
-  { series:'KXHIGHDFW', name:'Dallas',         short:'DFW', lat:32.7767,  lon:-96.7970  },
-  { series:'KXHIGHSLC', name:'Salt Lake City', short:'SLC', lat:40.7608,  lon:-111.8910 },
-  { series:'KXHIGHPHL', name:'Philadelphia',   short:'PHL', lat:39.9526,  lon:-75.1652  },
-  { series:'KXHIGHDC',  name:'Washington DC',  short:'DC',  lat:38.9072,  lon:-77.0369  },
-  { series:'KXHIGHMSP', name:'Minneapolis',    short:'MSP', lat:44.9778,  lon:-93.2650  },
-  { series:'KXHIGHSTL', name:'St. Louis',      short:'STL', lat:38.6270,  lon:-90.1994  },
-  { series:'KXHIGHDET', name:'Detroit',        short:'DET', lat:42.3314,  lon:-83.0458  },
-  { series:'KXHIGHSAN', name:'San Diego',      short:'SAN', lat:32.7157,  lon:-117.1611 },
-  { series:'KXHIGHMCO', name:'Orlando',        short:'MCO', lat:28.5383,  lon:-81.3792  },
-  { series:'KXHIGHORD', name:'Chicago O\'Hare',short:'ORD', lat:41.9742,  lon:-87.9073  },
+  { series:'KXHIGHNY',    name:'New York',       short:'NYC', lat:40.7789,  lon:-73.9692,  station:'KNYC'  },
+  { series:'KXHIGHCHI',   name:'Chicago',        short:'CHI', lat:41.8827,  lon:-87.6233,  station:'KMDW'  },
+  { series:'KXHIGHMIA',   name:'Miami',          short:'MIA', lat:25.7617,  lon:-80.1918,  station:'KMIA'  },
+  { series:'KXHIGHLAX',   name:'Los Angeles',    short:'LAX', lat:34.0522,  lon:-118.2437, station:'KLAX'  },
+  { series:'KXHIGHAUS',   name:'Austin',         short:'AUS', lat:30.2672,  lon:-97.7431,  station:'KAUS'  },
+  { series:'KXHIGHTBOS',  name:'Boston',         short:'BOS', lat:42.3601,  lon:-71.0589,  station:'KBOS'  },
+  { series:'KXHIGHDEN',   name:'Denver',         short:'DEN', lat:39.7392,  lon:-104.9903, station:'KDEN'  },
+  { series:'KXHIGHTHOU',  name:'Houston',        short:'HOU', lat:29.7604,  lon:-95.3698,  station:'KHOU'  },
+  { series:'KXHIGHTPHX',  name:'Phoenix',        short:'PHX', lat:33.4484,  lon:-112.0740, station:'KPHX'  },
+  { series:'KXHIGHTATL',  name:'Atlanta',        short:'ATL', lat:33.7490,  lon:-84.3880,  station:'KATL'  },
+  { series:'KXHIGHPHIL',  name:'Philadelphia',   short:'PHL', lat:39.9526,  lon:-75.1652,  station:'KPHL'  },
+  { series:'KXHIGHTDC',   name:'Washington DC',  short:'DC',  lat:38.9072,  lon:-77.0369,  station:'KDCA'  },
+  { series:'KXHIGHTDAL',  name:'Dallas',         short:'DAL', lat:32.7767,  lon:-96.7970,  station:'KDFW'  },
+  { series:'KXHIGHTSEA',  name:'Seattle',        short:'SEA', lat:47.6062,  lon:-122.3321, station:'KSEA'  },
+  { series:'KXHIGHTMIN',  name:'Minneapolis',    short:'MSP', lat:44.9778,  lon:-93.2650,  station:'KMSP'  },
+  { series:'KXHIGHTSFO',  name:'San Francisco',  short:'SFO', lat:37.7749,  lon:-122.4194, station:'KSFO'  },
 ];
 
 const MODELS = [
   { id:'gfs',   name:'GFS',   color:'#1a56db', url:'https://api.open-meteo.com/v1/gfs',      hourly:false },
   { id:'ecmwf', name:'ECMWF', color:'#7c3aed', url:'https://api.open-meteo.com/v1/ecmwf',    hourly:true  },
-  { id:'nbm',   name:'NBM',   color:'#0d7a3e', url:'https://api.open-meteo.com/v1/forecast',  hourly:false, extra:'&models=gfs025' },
+  { id:'nws',   name:'NWS',   color:'#0d7a3e', url:'nws' }, // uses api.weather.gov
   { id:'gem',   name:'GEM',   color:'#92400e', url:'https://api.open-meteo.com/v1/gem',       hourly:false },
   { id:'icon',  name:'ICON',  color:'#c81e1e', url:'https://api.open-meteo.com/v1/dwd-icon',  hourly:false },
 ];
+
+// NWS grid URL cache: series → { forecastHourly, observationStationsUrl }
+const nwsGridCache = {};
+// Hourly data cache: series → { hours:[], modelLines:{gfs:[],ecmwf[],...}, observed:[] }
+let hourlyCache = {};
 
 // ── STATE ────────────────────────────────────────────────────────────────────
 let activeSeries = CITIES[0].series;
@@ -419,18 +432,151 @@ async function fetchMarkets(city, force = false) {
   }
 }
 
-// ── OPEN-METEO ───────────────────────────────────────────────────────────────
+// ── NWS FETCH ────────────────────────────────────────────────────────────────
+async function getNWSGridUrls(city) {
+  if (!nwsGridCache[city.series]) {
+    const pts = await fetch(`https://api.weather.gov/points/${city.lat},${city.lon}`, {
+      headers: { 'User-Agent': 'WeatherEdge/1.0' }
+    });
+    if (!pts.ok) throw new Error(`points ${pts.status}`);
+    const pd = await pts.json();
+    nwsGridCache[city.series] = {
+      forecast:       pd.properties?.forecast,
+      forecastHourly: pd.properties?.forecastHourly,
+    };
+  }
+  return nwsGridCache[city.series];
+}
+
+async function fetchNWS(city) {
+  try {
+    const { forecast } = await getNWSGridUrls(city);
+    if (!forecast) throw new Error('no forecast URL');
+    const fc = await fetch(forecast, { headers: { 'User-Agent': 'WeatherEdge/1.0' } });
+    if (!fc.ok) throw new Error(`forecast ${fc.status}`);
+    const fd = await fc.json();
+    const periods = fd.properties?.periods || [];
+    const today = new Date().toLocaleDateString('en-CA');
+    const daytime = periods.find(p => {
+      const pDate = new Date(p.startTime).toLocaleDateString('en-CA');
+      return p.isDaytime && pDate === today;
+    }) || periods.find(p => p.isDaytime);
+    if (!daytime) throw new Error('no daytime period');
+    let temp = daytime.temperature;
+    if (daytime.temperatureUnit === 'C') temp = Math.round(temp * 9/5 + 32);
+    return temp;
+  } catch(e) {
+    console.warn('NWS daily failed:', e.message);
+    return null;
+  }
+}
+
+// ── HOURLY CHART DATA ────────────────────────────────────────────────────────
+async function fetchHourlyData(city) {
+  if (hourlyCache[city.series]) return;
+  const today = new Date().toLocaleDateString('en-CA');
+  const result = { hours: [], modelLines: {}, observed: [] };
+
+  // Build 24 hour labels for today
+  result.hours = Array.from({length:24}, (_,i) => i); // 0–23
+
+  // Fetch hourly model data from Open-Meteo in parallel
+  const openMeteoModels = MODELS.filter(m => m.url !== 'nws');
+  await Promise.all(openMeteoModels.map(async m => {
+    try {
+      let temps;
+      if (m.hourly) {
+        // ECMWF - already hourly
+        const url = `${m.url}?latitude=${city.lat}&longitude=${city.lon}&hourly=temperature_2m&temperature_unit=fahrenheit&forecast_days=1&timezone=auto`;
+        const r = await fetch(url);
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const d = await r.json();
+        if (d.error) throw new Error(d.reason);
+        temps = d.hourly?.temperature_2m?.slice(0, 24) || [];
+      } else {
+        // Daily models — fetch hourly via temperature_2m
+        const url = `${m.url}?latitude=${city.lat}&longitude=${city.lon}&hourly=temperature_2m&temperature_unit=fahrenheit&forecast_days=1&timezone=auto`;
+        const r = await fetch(url);
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const d = await r.json();
+        if (d.error) throw new Error(d.reason);
+        temps = d.hourly?.temperature_2m?.slice(0, 24) || [];
+      }
+      result.modelLines[m.id] = temps;
+    } catch(e) {
+      console.warn(`Hourly ${m.name} failed:`, e.message);
+      result.modelLines[m.id] = [];
+    }
+  }));
+
+  // NWS hourly forecast
+  try {
+    const { forecastHourly } = await getNWSGridUrls(city);
+    if (forecastHourly) {
+      const r = await fetch(forecastHourly, { headers: { 'User-Agent': 'WeatherEdge/1.0' } });
+      if (r.ok) {
+        const d = await r.json();
+        const periods = d.properties?.periods || [];
+        // Map to 24-hour array for today
+        const nwsHourly = new Array(24).fill(null);
+        for (const p of periods) {
+          const pDate = new Date(p.startTime).toLocaleDateString('en-CA');
+          if (pDate !== today) continue;
+          const hour = new Date(p.startTime).getHours();
+          if (hour >= 0 && hour < 24) {
+            let t = p.temperature;
+            if (p.temperatureUnit === 'C') t = t * 9/5 + 32;
+            nwsHourly[hour] = Math.round(t);
+          }
+        }
+        result.modelLines['nws'] = nwsHourly;
+      }
+    }
+  } catch(e) {
+    console.warn('NWS hourly failed:', e.message);
+    result.modelLines['nws'] = [];
+  }
+
+  // NWS observed actuals from station
+  try {
+    const stationUrl = `https://api.weather.gov/stations/${city.station}/observations?start=${today}T00:00:00Z&end=${today}T23:59:59Z&limit=48`;
+    const r = await fetch(stationUrl, { headers: { 'User-Agent': 'WeatherEdge/1.0' } });
+    if (r.ok) {
+      const d = await r.json();
+      const obs = new Array(24).fill(null);
+      for (const f of (d.features || [])) {
+        const t = f.properties?.temperature?.value;
+        const ts = f.properties?.timestamp;
+        if (t == null || !ts) continue;
+        const hour = new Date(ts).getHours();
+        // Convert C to F
+        const tF = Math.round(t * 9/5 + 32);
+        if (hour >= 0 && hour < 24) obs[hour] = tF;
+      }
+      result.observed = obs;
+    }
+  } catch(e) {
+    console.warn('NWS observations failed:', e.message);
+    result.observed = new Array(24).fill(null);
+  }
+
+  hourlyCache[city.series] = result;
+}
+
+// ── OPEN-METEO (daily max) ────────────────────────────────────────────────────
 async function fetchWeather(city) {
   if (wxCache[city.series]) return;
-  const today = new Date().toISOString().split('T')[0];
   const results = {};
 
   await Promise.all(MODELS.map(async m => {
     try {
-      let url, v;
+      if (m.url === 'nws') {
+        results[m.id] = await fetchNWS(city);
+        return;
+      }
+      let v;
       if (m.hourly) {
-        // ECMWF: fetch hourly temps for today, find the max
-        url = `${m.url}?latitude=${city.lat}&longitude=${city.lon}&hourly=temperature_2m&temperature_unit=fahrenheit&forecast_days=1&timezone=auto${m.extra||''}`;
+        const url = `${m.url}?latitude=${city.lat}&longitude=${city.lon}&hourly=temperature_2m&temperature_unit=fahrenheit&forecast_days=1&timezone=auto`;
         const r = await fetch(url);
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         const d = await r.json();
@@ -438,8 +584,7 @@ async function fetchWeather(city) {
         const temps = d.hourly?.temperature_2m?.filter(t => t != null) || [];
         v = temps.length ? Math.max(...temps) : null;
       } else {
-        // All others support daily temperature_2m_max
-        url = `${m.url}?latitude=${city.lat}&longitude=${city.lon}&daily=temperature_2m_max&temperature_unit=fahrenheit&forecast_days=1&timezone=auto${m.extra||''}`;
+        const url = `${m.url}?latitude=${city.lat}&longitude=${city.lon}&daily=temperature_2m_max&temperature_unit=fahrenheit&forecast_days=1&timezone=auto`;
         const r = await fetch(url);
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         const d = await r.json();
@@ -566,6 +711,15 @@ function renderLeft() {
         <div class="mkt-sub">Kalshi daily temperature market · NWS settlement</div>
       </div>
       <div class="mkt-date">${today}</div>
+    </div>
+
+    <div class="section-head">Hourly Temperature Chart</div>
+    <div class="chart-wrap">
+      <div class="chart-header">
+        <span class="chart-title">Today's hourly temps — forecasts vs actual</span>
+        <div class="chart-legend" id="chartLegend"></div>
+      </div>
+      <canvas class="temp-chart" id="tempChart" height="200"></canvas>
     </div>
 
     <div class="section-head">Kalshi Market Brackets</div>
@@ -697,16 +851,138 @@ function renderEdge(city, markets, wx, score) {
   </div>`;
 }
 
+// ── CHART ──────────────────────────────────────────────────────────────────
+function drawChart(series) {
+  const canvas = document.getElementById('tempChart');
+  const legendEl = document.getElementById('chartLegend');
+  if (!canvas) return;
+
+  const hd = hourlyCache[series];
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.offsetWidth, H = 200;
+  canvas.width  = W * dpr;
+  canvas.height = H * dpr;
+  ctx.scale(dpr, dpr);
+
+  // Collect all valid values for y-range
+  const allVals = [];
+  MODELS.forEach(m => {
+    const line = hd?.modelLines?.[m.id] || [];
+    line.forEach(v => { if (v != null) allVals.push(v); });
+  });
+  (hd?.observed || []).forEach(v => { if (v != null) allVals.push(v); });
+
+  if (allVals.length === 0) {
+    ctx.fillStyle = '#9a9088';
+    ctx.font = '12px IBM Plex Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('Loading chart data...', W/2, H/2);
+    return;
+  }
+
+  const minV = Math.floor(Math.min(...allVals) - 3);
+  const maxV = Math.ceil(Math.max(...allVals) + 3);
+
+  const PAD = { top:16, right:16, bottom:28, left:38 };
+  const cW = W - PAD.left - PAD.right;
+  const cH = H - PAD.top  - PAD.bottom;
+
+  const xPos = i  => PAD.left + (i / 23) * cW;
+  const yPos = v  => PAD.top  + (1 - (v - minV) / (maxV - minV)) * cH;
+
+  // Grid lines
+  ctx.strokeStyle = '#e0dbd2';
+  ctx.lineWidth = 1;
+  const ticks = 4;
+  for (let i = 0; i <= ticks; i++) {
+    const v = minV + (i / ticks) * (maxV - minV);
+    const y = yPos(v);
+    ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(W - PAD.right, y);
+    ctx.stroke();
+    ctx.fillStyle = '#9a9088';
+    ctx.font = `${10 * dpr / dpr}px IBM Plex Mono, monospace`;
+    ctx.textAlign = 'right';
+    ctx.fillText(Math.round(v) + '°', PAD.left - 4, y + 3.5);
+  }
+
+  // X axis hour labels
+  ctx.fillStyle = '#9a9088';
+  ctx.textAlign = 'center';
+  ctx.font = '9px IBM Plex Mono, monospace';
+  [0, 6, 12, 18, 23].forEach(h => {
+    const lbl = h === 0 ? '12a' : h < 12 ? `${h}a` : h === 12 ? '12p' : `${h-12}p`;
+    ctx.fillText(lbl, xPos(h), H - PAD.bottom + 14);
+  });
+
+  // Current time line
+  const now = new Date();
+  const nowH = now.getHours() + now.getMinutes() / 60;
+  if (nowH >= 0 && nowH <= 23) {
+    const nx = PAD.left + (nowH / 23) * cW;
+    ctx.strokeStyle = '#d1d5db';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath(); ctx.moveTo(nx, PAD.top); ctx.lineTo(nx, H - PAD.bottom);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Draw model lines
+  MODELS.forEach(m => {
+    const line = hd?.modelLines?.[m.id] || [];
+    const pts = line.map((v, i) => v != null ? { x: xPos(i), y: yPos(v) } : null).filter(Boolean);
+    if (pts.length < 2) return;
+    ctx.strokeStyle = m.color;
+    ctx.lineWidth = m.id === 'nws' ? 2.5 : 1.5;
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+    ctx.stroke();
+  });
+
+  // Draw observed actuals as dashed black line with dots
+  const obs = hd?.observed || [];
+  const obsPts = obs.map((v, i) => v != null ? { x: xPos(i), y: yPos(v), v } : null).filter(Boolean);
+  if (obsPts.length >= 1) {
+    ctx.strokeStyle = '#1a1714';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 3]);
+    ctx.beginPath();
+    obsPts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+    ctx.stroke();
+    ctx.setLineDash([]);
+    // Dots at each observed point
+    obsPts.forEach(p => {
+      ctx.fillStyle = '#1a1714';
+      ctx.beginPath(); ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2); ctx.fill();
+    });
+  }
+
+  // Legend
+  if (legendEl) {
+    const legendItems = [
+      ...MODELS.map(m => `<div class="chart-legend-item"><div class="chart-legend-line" style="background:${m.color};width:18px;height:${m.id==='nws'?3:2}px;border-radius:1px"></div>${m.name}</div>`),
+      obsPts.length > 0 ? `<div class="chart-legend-item"><div style="width:18px;border-top:2px dashed #1a1714"></div>Actual</div>` : ''
+    ];
+    legendEl.innerHTML = legendItems.join('');
+  }
+}
+
 // ── CITY SELECT ────────────────────────────────────────────────────────────────
 async function selectCity(series) {
   activeSeries = series;
   renderTabs();
   renderLeft();
   const city = CITIES.find(c => c.series === series);
-  if (!mktCache[series]?.loaded) { await fetchMarkets(city); }
-  if (!wxCache[series])          { await fetchWeather(city); }
+  const fetches = [];
+  if (!mktCache[series]?.loaded)  fetches.push(fetchMarkets(city));
+  if (!wxCache[series])           fetches.push(fetchWeather(city));
+  if (!hourlyCache[series])       fetches.push(fetchHourlyData(city));
+  await Promise.all(fetches);
   renderLeft();
   renderTabs();
+  drawChart(series);
 }
 
 // ── AI CHAT ──────────────────────────────────────────────────────────────────
@@ -815,34 +1091,24 @@ function toast(msg) {
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-
 async function init() {
   setStatus('loading', 'Loading...');
   renderTabs();
 
-  // Load first city immediately so UI shows fast
   const first = CITIES[0];
-  await Promise.all([fetchMarkets(first), fetchWeather(first)]);
+  await Promise.all([fetchMarkets(first), fetchWeather(first), fetchHourlyData(first)]);
   renderLeft();
   renderTabs();
-  setStatus('live', 'Live · Kalshi + Open-Meteo');
+  drawChart(first.series);
+  setStatus('live', 'Live · Kalshi + Open-Meteo + NWS');
 
-  // Load remaining cities in batches of 3 with 600ms gap to avoid Kalshi 429
-  const rest = CITIES.slice(1);
-  for (let i = 0; i < rest.length; i += 3) {
-    const batch = rest.slice(i, i + 3);
-    await Promise.all(batch.map(city => Promise.all([fetchMarkets(city), fetchWeather(city)])));
-    renderTabs();
-    if (i + 3 < rest.length) await sleep(600);
-  }
-
-  // Refresh active city market prices every 30s to stay live
+  // Refresh active city prices every 30s
   setInterval(async () => {
     const city = CITIES.find(c => c.series === activeSeries);
     if (city) {
       await fetchMarkets(city, true);
       renderLeft();
+      drawChart(activeSeries);
       setStatus('live', `Live · ${new Date().toLocaleTimeString()}`);
     }
   }, 30000);
