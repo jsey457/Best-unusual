@@ -393,17 +393,16 @@ const MODELS = [
   { id:'icon',  name:'ICON',  color:'#c81e1e', url:'https://api.open-meteo.com/v1/dwd-icon',  hourly:false },
 ];
 
-// NWS grid URL cache: series → { forecastHourly, observationStationsUrl }
+// NWS grid URL cache: series → { forecast, forecastHourly }
 const nwsGridCache = {};
-// Hourly data cache: series → { hours:[], modelLines:{gfs:[],ecmwf[],...}, observed:[] }
-let hourlyCache = {};
 
+// ── STATE ─────────────────────────────────────────────────────────────────────
 let activeSeries = CITIES[0].series;
-let mktCache  = {};
-let wxCache   = {};
+let mktCache    = {};
+let wxCache     = {};
 let hourlyCache = {};
-let activeView = 'today';
-let histLoaded = false;
+let activeView  = 'today';
+let histLoaded  = false;
 
 // ── KALSHI FETCH ─────────────────────────────────────────────────────────────
 async function kalshi(path, params = {}) {
